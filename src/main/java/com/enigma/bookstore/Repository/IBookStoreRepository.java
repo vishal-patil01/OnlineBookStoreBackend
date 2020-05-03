@@ -1,10 +1,12 @@
-package com.enigma.bookstore.Repository;
+package com.enigma.bookstore.repository;
 
-import com.enigma.bookstore.model.BookDetails;
+import com.enigma.bookstore.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface IBookStoreRepository extends JpaRepository<BookDetails, Integer> {
+import java.util.Optional;
 
+@Repository
+public interface IBookStoreRepository extends JpaRepository<Book, Integer> {
+    Optional<Book> findByIsbnNumber(String isbnNumber);
 }

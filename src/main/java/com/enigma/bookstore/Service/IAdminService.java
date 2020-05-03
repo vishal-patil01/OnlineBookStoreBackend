@@ -1,8 +1,8 @@
-package com.enigma.bookstore.Service;
+package com.enigma.bookstore.service;
 
-import com.enigma.bookstore.dao.BookDAO;
-import com.enigma.bookstore.model.BookDetails;
+import com.enigma.bookstore.dto.BookDTO;
+import com.enigma.bookstore.dto.Response;
 
 public interface IAdminService {
-    BookDetails addBook(BookDAO bookDAO);
+    Response addBook(BookDTO bookDTO);
 }
