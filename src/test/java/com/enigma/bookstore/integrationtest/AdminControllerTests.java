@@ -69,4 +69,18 @@ class AdminControllerTests {
             Assert.assertEquals(AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS, e.type);
         }
     }
+
+    @Test
+    public void givenBookDetails_WhenAdded_ShouldThrowBookNameAndAuthorNameAlreadyException() {
+        try {
+            bookDTO = new BookDTO("13665255456L", "Wings Of Fire", "Abdul Kalam", 400.0, 2, "Dr. Kalam by narrating his life journey evokes the reader to identify with one’s inner fire and potential, for he was of the firm belief that each one of us was born with the strength and potential to make a tangible change in the world.", "/temp/pic01", 2014);
+            book = new Book(bookDTO);
+            jsonDTO = gson.toJson(book);
+            request = new HttpEntity<>(jsonDTO, headers);
+            this.restTemplate.postForEntity("http://localhost:" + port + "/bookstore/admin/book",
+                    request, Book.class).getStatusCode();
+        } catch (AdminException e) {
+            Assert.assertEquals(AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS, e.type);
+        }
+    }
 }

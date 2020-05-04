@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
+@Setter
+@Getter
 public class Response {
     private Integer statusCode;
     private String message;
+
 }

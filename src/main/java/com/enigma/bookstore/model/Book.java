@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Entity
 @Getter
@@ -27,11 +28,11 @@ public class Book {
     private Integer id;
 
     @NotNull
-    @Length(min = 2, max = 50, message = "Invalid Book Name 2 to 50 Character Required.")
+    @Length(min = 2, max = 50, message = "Invalid Book Name")
     private String bookName;
 
     @NotNull
-    @Length(min = 3, message = "Invalid Author Name Minimum 3 Character Required.")
+    @Pattern(regexp = "^[A-za-z][A-Za-z .]{3,}$", message = "Invalid Author Name.")
     private String authorName;
 
     @NotNull
@@ -45,7 +46,7 @@ public class Book {
     private String bookImageSrc;
 
     @NotNull
-    @Range(min = 1000, max = 2021, message = "Invalid Publishing Year.")
+    @Range(min = 1500, max = 2021, message = "Invalid Publishing Year.")
     private int publishingYear;
 
     public Book(BookDTO bookDTO) {

@@ -46,7 +46,7 @@ class AdminControllerTest {
     void givenWrongUrl_WhenGetResponse_ShouldReturn404Error() throws Exception {
         bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "Abdul Kalam", 400, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
         String jsonDto = gson.toJson(bookDTO);
-        this.mockMvc.perform(post("/addmybook").content(jsonDto)
+        this.mockMvc.perform(post("/book").content(jsonDto)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
