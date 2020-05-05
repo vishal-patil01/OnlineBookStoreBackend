@@ -46,17 +46,6 @@ public class Book {
     private String bookImageSrc;
 
     @NotNull
-    @Range(min = 1500, max = 2021, message = "Invalid Publishing Year.")
+    @Range(min = 1500, max = 2020, message = "Invalid Publishing Year.")
     private int publishingYear;
-
-    public Book(BookDTO bookDTO) {
-        this.isbnNumber = bookDTO.getIsbnNumber();
-        this.bookName = bookDTO.getBookName();
-        this.authorName = bookDTO.getAuthorName();
-        this.bookPrice = bookDTO.getBookPrice();
-        this.noOfCopies = bookDTO.getNoOfCopies();
-        this.bookDetail = bookDTO.getBookDetail();
-        this.bookImageSrc = bookDTO.getBookImageSrc();
-        this.publishingYear = bookDTO.getPublishingYear();
-    }
 }

@@ -16,9 +16,11 @@ public class AdminService implements IAdminService {
     @Autowired
     private IBookStoreRepository bookStoreRepository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     @Override
     public Response addBook(BookDTO bookDTO) {
-        Book book = new Book(bookDTO);
         boolean byIsbnNumber = bookStoreRepository.findByIsbnNumber(bookDTO.getIsbnNumber()).isPresent();
         boolean byBookName = bookStoreRepository.findByBookNameAndAuthorName(bookDTO.getBookName(), bookDTO.getAuthorName()).isPresent();
         if (byIsbnNumber) {
@@ -26,6 +28,7 @@ public class AdminService implements IAdminService {
         } else if (byBookName) {
             throw new AdminException("Book Name and Author Name is already exists.", AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS);
         }
+        Book book = modelMapper.map(bookDTO, Book.class);
         bookStoreRepository.save(book);
         return new Response(200, "Book Added successfully.");
     }

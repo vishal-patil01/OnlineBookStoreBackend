@@ -40,6 +40,6 @@ public class BookDTO {
     private String bookImageSrc;
 
     @NotNull
-    @Range(min = 1500, max = 2021, message = "Invalid Publishing Year.")
+    @Range(min = 1500, max = 2020, message = "Invalid Publishing Year.")
     private int publishingYear;
 }

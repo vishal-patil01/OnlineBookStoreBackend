@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,31 +26,44 @@ public class AdminServiceTest {
     @MockBean
     IBookStoreRepository bookStoreRepository;
 
-    @InjectMocks
     @Autowired
     AdminService adminService;
+
+    @InjectMocks
+    ModelMapper modelMapper;
 
     BookDTO bookDTO;
 
     @Test
     void givenBookDetails_WhenGetResponse_ShouldReturnBookDetails() {
         bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
-        Book addedBook = new Book(bookDTO);
-        when(bookStoreRepository.save(any())).thenReturn(addedBook);
+        Book book = modelMapper.map(bookDTO, Book.class);
+        when(bookStoreRepository.save(any())).thenReturn(book);
         Response existingBook = adminService.addBook(bookDTO);
         Assert.assertEquals("Book Added successfully.", existingBook.getMessage());
     }
 
     @Test
-    void givenSameBookDetails_WhenGetResponse_ShouldThrowException() {
+    void givenSameBookDetails_WhenGetResponse_ShouldThrowIsbnNumberAlreadyExistsException() {
         try {
             bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
-            Book addedBook = new Book(bookDTO);
-            when(bookStoreRepository.save(any())).thenReturn(addedBook);
+            when(bookStoreRepository.save(any())).thenReturn(bookDTO);
             when(bookStoreRepository.findByIsbnNumber(bookDTO.getIsbnNumber()))
                     .thenThrow(new AdminException("ISBN Number is already exists.", AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS));
         } catch (AdminException e) {
             Assert.assertEquals(AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS, e.type);
+        }
+    }
+
+    @Test
+    void givenSameBookDetails_WhenGetResponse_ShouldThrowBookNameAndAuthorNameAlreadyExistsException() {
+        try {
+            bookDTO = new BookDTO("131655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+            when(bookStoreRepository.save(any())).thenReturn(bookDTO);
+            when(bookStoreRepository.findByBookNameAndAuthorName(bookDTO.getBookName(),bookDTO.getAuthorName()))
+                    .thenThrow(new AdminException("Book Name and Author Name is already exists.", AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS));
+        } catch (AdminException e) {
+            Assert.assertEquals(AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS, e.type);
         }
     }
 }
