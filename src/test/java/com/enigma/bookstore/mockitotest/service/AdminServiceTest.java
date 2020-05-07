@@ -49,9 +49,9 @@ public class AdminServiceTest {
             bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
             when(bookStoreRepository.save(any())).thenReturn(bookDTO);
             when(bookStoreRepository.findByIsbnNumber(bookDTO.getIsbnNumber()))
-                    .thenThrow(new AdminException("ISBN Number is already exists.", AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS));
+                    .thenThrow(new AdminException("ISBN Number is already exists."));
         } catch (AdminException e) {
-            Assert.assertEquals(AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS, e.type);
+            Assert.assertEquals("ISBN Number is already exists.", e.getMessage());
         }
     }
 
@@ -61,9 +61,9 @@ public class AdminServiceTest {
             bookDTO = new BookDTO("131655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
             when(bookStoreRepository.save(any())).thenReturn(bookDTO);
             when(bookStoreRepository.findByBookNameAndAuthorName(bookDTO.getBookName(),bookDTO.getAuthorName()))
-                    .thenThrow(new AdminException("Book Name and Author Name is already exists.", AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS));
+                    .thenThrow(new AdminException("Book Name and Author Name is already exists."));
         } catch (AdminException e) {
-            Assert.assertEquals(AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS, e.type);
+            Assert.assertEquals("Book Name and Author Name is already exists.", e.getMessage());
         }
     }
 }

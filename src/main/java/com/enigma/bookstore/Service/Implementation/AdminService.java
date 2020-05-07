@@ -24,9 +24,9 @@ public class AdminService implements IAdminService {
         boolean byIsbnNumber = bookStoreRepository.findByIsbnNumber(bookDTO.getIsbnNumber()).isPresent();
         boolean byBookName = bookStoreRepository.findByBookNameAndAuthorName(bookDTO.getBookName(), bookDTO.getAuthorName()).isPresent();
         if (byIsbnNumber) {
-            throw new AdminException("ISBN Number is already exists.", AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS);
+            throw new AdminException("ISBN Number is already exists.");
         } else if (byBookName) {
-            throw new AdminException("Book Name and Author Name is already exists.", AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS);
+            throw new AdminException("Book Name and Author Name is already exists.");
         }
         Book book = modelMapper.map(bookDTO, Book.class);
         bookStoreRepository.save(book);

@@ -67,7 +67,7 @@ class AdminControllerTests {
             this.restTemplate.postForEntity("http://localhost:" + port + "/bookstore/admin/book",
                     request, Book.class).getStatusCode();
         } catch (AdminException e) {
-            Assert.assertEquals(AdminException.ExceptionType.BOOK_AND_AUTHOR_NAME_ALREADY_EXISTS, e.type);
+            Assert.assertEquals("Book Name and Author Name is already exists.", e.getMessage());
         }
     }
 
@@ -81,7 +81,7 @@ class AdminControllerTests {
             this.restTemplate.postForEntity("http://localhost:" + port + "/bookstore/admin/book",
                     request, Book.class).getStatusCode();
         } catch (AdminException e) {
-            Assert.assertEquals(AdminException.ExceptionType.ISBN_NUMBER_ALREADY_EXISTS, e.type);
+            Assert.assertEquals("ISBN Number is already exists.", e.getMessage());
         }
     }
 }
