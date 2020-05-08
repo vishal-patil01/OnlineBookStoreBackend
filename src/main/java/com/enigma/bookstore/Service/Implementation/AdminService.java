@@ -2,7 +2,7 @@ package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
-import com.enigma.bookstore.exception.AdminException;
+import com.enigma.bookstore.exception.BookStoreException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.repository.IBookStoreRepository;
 import com.enigma.bookstore.service.IAdminService;
@@ -24,12 +24,12 @@ public class AdminService implements IAdminService {
         boolean byIsbnNumber = bookStoreRepository.findByIsbnNumber(bookDTO.getIsbnNumber()).isPresent();
         boolean byBookName = bookStoreRepository.findByBookNameAndAuthorName(bookDTO.getBookName(), bookDTO.getAuthorName()).isPresent();
         if (byIsbnNumber) {
-            throw new AdminException("ISBN Number is already exists.");
+            throw new BookStoreException("ISBN Number is already exists.");
         } else if (byBookName) {
-            throw new AdminException("Book Name and Author Name is already exists.");
+            throw new BookStoreException("Book Name and Author Name is already exists.");
         }
         Book book = modelMapper.map(bookDTO, Book.class);
         bookStoreRepository.save(book);
-        return new Response(200, "Book Added successfully.");
+        return new Response("Book Added successfully.",200);
     }
 }

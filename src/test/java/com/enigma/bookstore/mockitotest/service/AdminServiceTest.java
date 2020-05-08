@@ -2,7 +2,7 @@ package com.enigma.bookstore.mockitotest.service;
 
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
-import com.enigma.bookstore.exception.AdminException;
+import com.enigma.bookstore.exception.BookStoreException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.repository.IBookStoreRepository;
 import com.enigma.bookstore.service.implementation.AdminService;
@@ -49,9 +49,9 @@ public class AdminServiceTest {
             bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
             when(bookStoreRepository.save(any())).thenReturn(bookDTO);
             when(bookStoreRepository.findByIsbnNumber(bookDTO.getIsbnNumber()))
-                    .thenThrow(new AdminException("ISBN Number is already exists."));
-        } catch (AdminException e) {
-            Assert.assertEquals("ISBN Number is already exists.", e.getMessage());
+                    .thenThrow(new BookStoreException("ISBN Number is already exists."));
+        } catch (BookStoreException e) {
+            Assert.assertEquals("ISBN Number is already exists.",e.getMessage());
         }
     }
 
@@ -61,8 +61,8 @@ public class AdminServiceTest {
             bookDTO = new BookDTO("131655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
             when(bookStoreRepository.save(any())).thenReturn(bookDTO);
             when(bookStoreRepository.findByBookNameAndAuthorName(bookDTO.getBookName(),bookDTO.getAuthorName()))
-                    .thenThrow(new AdminException("Book Name and Author Name is already exists."));
-        } catch (AdminException e) {
+                    .thenThrow(new BookStoreException("Book Name and Author Name is already exists."));
+        } catch (BookStoreException e) {
             Assert.assertEquals("Book Name and Author Name is already exists.", e.getMessage());
         }
     }

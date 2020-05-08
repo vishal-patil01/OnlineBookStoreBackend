@@ -5,11 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 @ControllerAdvice
-public class AdminExceptionHandler {
-    @ExceptionHandler(AdminException.class)
-    public ResponseEntity<Response> onlineAdminExceptionHandler(AdminException e) {
-        Response response = new Response(208, e.getMessage());
+public class BookStoreExceptionHandler {
+    @ExceptionHandler(BookStoreException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(BookStoreException e) {
+        Response response = new Response(e.getMessage(), 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
 }

@@ -2,14 +2,12 @@ package com.enigma.bookstore.integrationtest;
 
 import com.enigma.bookstore.OnlineBookStoreBackendApplication;
 import com.enigma.bookstore.dto.BookDTO;
-import com.enigma.bookstore.exception.AdminException;
+import com.enigma.bookstore.exception.BookStoreException;
 import com.enigma.bookstore.model.Book;
 import com.google.gson.Gson;
 import org.junit.Assert;
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -66,8 +64,8 @@ class AdminControllerTests {
             request = new HttpEntity<>(jsonDTO, headers);
             this.restTemplate.postForEntity("http://localhost:" + port + "/bookstore/admin/book",
                     request, Book.class).getStatusCode();
-        } catch (AdminException e) {
-            Assert.assertEquals("Book Name and Author Name is already exists.", e.getMessage());
+        } catch (BookStoreException e) {
+            Assert.assertEquals("Book Name and Author Name is already exists.",e.getMessage());
         }
     }
 
@@ -80,8 +78,8 @@ class AdminControllerTests {
             request = new HttpEntity<>(jsonDTO, headers);
             this.restTemplate.postForEntity("http://localhost:" + port + "/bookstore/admin/book",
                     request, Book.class).getStatusCode();
-        } catch (AdminException e) {
-            Assert.assertEquals("ISBN Number is already exists.", e.getMessage());
+        } catch (BookStoreException e) {
+            Assert.assertEquals("ISBN Number is already exists.",e.getMessage());
         }
     }
 }
