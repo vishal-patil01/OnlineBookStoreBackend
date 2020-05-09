@@ -30,6 +30,6 @@ public class AdminService implements IAdminService {
         }
         Book book = modelMapper.map(bookDTO, Book.class);
         bookStoreRepository.save(book);
-        return new Response("Book Added successfully.",200);
+        return new Response("Book Added successfully.", 200);
     }
 }

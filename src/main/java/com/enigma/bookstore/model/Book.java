@@ -1,6 +1,5 @@
 package com.enigma.bookstore.model;
 
-import com.enigma.bookstore.dto.BookDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

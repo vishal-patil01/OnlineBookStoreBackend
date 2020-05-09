@@ -36,7 +36,7 @@ class AdminControllerTest {
     void givenRequest_WhenGetResponse_ItShouldReturnStatusOk() throws Exception {
         bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "Abdul Kalam", 400, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
         String jsonDto = gson.toJson(bookDTO);
-        Response response = new Response("ADDED",200);
+        Response response = new Response("ADDED", 200);
         when(adminService.addBook(any())).thenReturn(response);
         this.mockMvc.perform(post("/bookstore/admin/book").content(jsonDto)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
