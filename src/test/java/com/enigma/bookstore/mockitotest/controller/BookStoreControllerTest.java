@@ -4,7 +4,6 @@ import com.enigma.bookstore.controller.BookStoreController;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.exception.BookStoreException;
-import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.service.implementation.BookStoreService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -25,22 +24,18 @@ public class BookStoreControllerTest {
     @MockBean
     private BookStoreService bookStoreService;
 
-    @InjectMocks
-    ModelMapper modelMapper;
-
-    List<Book> list = new ArrayList<>();
+    List<BookDTO> list = new ArrayList<BookDTO>();
     BookDTO bookDTO;
-    Book book;
+    BookDTO book;
 
     @Test
     void givenRequest_WhenGetResponse_ItShouldReturnBooks() {
         bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
-        book = modelMapper.map(bookDTO, Book.class);
-        list.add(book);
+        list.add(bookDTO);
         Response response = new Response(list, 200);
         when(bookStoreService.getAllBooks(anyInt(), anyInt())).thenReturn(response);
         Response allBooks = bookStoreService.getAllBooks(1, 12);
-        Assert.assertEquals(list.get(0).getIsbnNumber(), allBooks.getBookList().get(0).getIsbnNumber());
+        Assert.assertEquals(list.get(0).isbnNumber, allBooks.getBookList().get(0).isbnNumber);
     }
 
     @Test
@@ -56,8 +51,7 @@ public class BookStoreControllerTest {
     @Test
     void givenRequest_WhenGetResponse_ShouldReturnCount() {
         bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
-        book = modelMapper.map(bookDTO, Book.class);
-        list.add(book);
+        list.add(bookDTO);
         when(bookStoreService.getTotalBookCount()).thenReturn(5);
         int count = bookStoreService.getTotalBookCount();
         Assert.assertEquals(5, count);

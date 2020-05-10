@@ -1,8 +1,7 @@
 package com.enigma.bookstore.model;
 
+import com.enigma.bookstore.dto.BookDTO;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
@@ -12,8 +11,6 @@ import javax.validation.constraints.Pattern;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
 @Table(name = "bookdetails")
 public class Book {
 
@@ -47,4 +44,18 @@ public class Book {
     @NotNull
     @Range(min = 1500, max = 2020, message = "Invalid Publishing Year.")
     private int publishingYear;
+
+    public Book() {
+    }
+
+    public Book(BookDTO bookDTO) {
+        this.isbnNumber = bookDTO.isbnNumber;
+        this.bookName = bookDTO.bookName;
+        this.authorName = bookDTO.authorName;
+        this.bookPrice = bookDTO.bookPrice;
+        this.noOfCopies = bookDTO.noOfCopies;
+        this.bookDetail = bookDTO.bookDetail;
+        this.bookImageSrc = bookDTO.bookImageSrc;
+        this.publishingYear = bookDTO.publishingYear;
+    }
 }

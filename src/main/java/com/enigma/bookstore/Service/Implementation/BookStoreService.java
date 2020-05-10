@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service.implementation;
 
+import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.exception.BookStoreException;
 import com.enigma.bookstore.model.Book;
@@ -11,6 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class BookStoreService implements IBookStoreService {
 
@@ -21,8 +26,12 @@ public class BookStoreService implements IBookStoreService {
     public Response getAllBooks(int pageStart, int pageEnd) {
         Pageable pageRequest = PageRequest.of(pageStart, pageEnd);
         Page<Book> bookList = iBookStoreRepository.findAll(pageRequest);
-        if (bookList.hasContent())
-            return new Response(bookList.getContent(), 200);
+        if (bookList.hasContent()) {
+            List<BookDTO> allBookList = bookList.stream()
+                    .map(BookDTO::new)
+                    .collect(Collectors.toList());
+            return new Response(allBookList, 200);
+        }
         throw new BookStoreException("There Are No Books Available");
     }
 

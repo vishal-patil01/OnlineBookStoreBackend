@@ -41,7 +41,7 @@ public class BookStoreControllerTests {
     public void givenRequest_WhenGetResponse_ShouldReturnTotalBookCount() {
         String bookRecords = this.restTemplate.getForEntity("http://localhost:" + port + "/bookstore/count",
                 String.class).getBody();
-        Assert.assertEquals(bookRecords, "14");
+        Assert.assertEquals(bookRecords, "13");
     }
 
     @Test
@@ -49,5 +49,12 @@ public class BookStoreControllerTests {
         String bookRecords = this.restTemplate.getForEntity("http://localhost:" + port + "/bookstore/book/3/5",
                 String.class).getBody();
         Assert.assertTrue(bookRecords.contains("There Are No Books Available"));
+    }
+
+    @Test
+    public void givenRequest_WhenGetResponse_ShouldReturnSearchedBookList() {
+        String bookRecords = this.restTemplate.getForEntity("http://localhost:" + port + "/bookstore/search/Irresistible",
+                String.class).getBody();
+        Assert.assertTrue(bookRecords.contains("Irresistible"));
     }
 }

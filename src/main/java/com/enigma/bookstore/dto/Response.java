@@ -1,24 +1,28 @@
 package com.enigma.bookstore.dto;
 
 import com.enigma.bookstore.model.Book;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
-@Setter
-@Getter
 public class Response {
-    private Integer statusCode;
+    private int statusCode;
     private String message;
-    List<Book> bookList;
+    List<BookDTO> bookList;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public List<BookDTO> getBookList() {
+        return bookList;
+    }
 
     public Response(String message, int statusCode) {
         this.message = message;
         this.statusCode = statusCode;
     }
 
-    public Response(List<Book> bookList, int statusCode) {
+    public Response(List<BookDTO> bookList, int statusCode) {
         this.statusCode = statusCode;
         this.bookList = bookList;
     }
