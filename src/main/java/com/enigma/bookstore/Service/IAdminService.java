@@ -1,8 +1,8 @@
 package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.dto.BookDTO;
-import com.enigma.bookstore.dto.Response;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IAdminService {
-    Response addBook(BookDTO bookDTO);
+    String addBook(BookDTO bookDTO);
 }

@@ -1,17 +1,23 @@
 package com.enigma.bookstore.model;
 
 import com.enigma.bookstore.dto.BookDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "bookdetails")
+@Setter
+@NoArgsConstructor
+@Table(name = "book")
 public class Book {
 
     @NotNull
@@ -44,9 +50,6 @@ public class Book {
     @NotNull
     @Range(min = 1500, max = 2020, message = "Invalid Publishing Year.")
     private int publishingYear;
-
-    public Book() {
-    }
 
     public Book(BookDTO bookDTO) {
         this.isbnNumber = bookDTO.isbnNumber;

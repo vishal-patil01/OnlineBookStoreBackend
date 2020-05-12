@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class BookStoreExceptionHandler {
-    @ExceptionHandler(BookStoreException.class)
-    public ResponseEntity<Response> onlineBookStoreExceptionHandler(BookStoreException e) {
-        Response response = new Response(e.getMessage(), 208);
+    @ExceptionHandler(BookException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(BookException e) {
+        Response response = new Response(e.getMessage(), null, 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
 }

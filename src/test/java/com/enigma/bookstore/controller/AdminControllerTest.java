@@ -1,8 +1,6 @@
-package com.enigma.bookstore.mockitotest.controller;
+package com.enigma.bookstore.controller;
 
-import com.enigma.bookstore.controller.AdminController;
 import com.enigma.bookstore.dto.BookDTO;
-import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.service.implementation.AdminService;
 import com.google.gson.Gson;
 import org.junit.Assert;
@@ -11,13 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -27,18 +28,22 @@ class AdminControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    AdminController adminController;
+
     @MockBean
     private AdminService adminService;
     BookDTO bookDTO;
     Gson gson = new Gson();
+    List<BookDTO> list = new ArrayList<>();
 
     @Test
     void givenRequest_WhenGetResponse_ItShouldReturnStatusOk() throws Exception {
-        bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "Abdul Kalam", 400, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
-        String jsonDto = gson.toJson(bookDTO);
-        Response response = new Response("ADDED", 200);
-        when(adminService.addBook(any())).thenReturn(response);
-        this.mockMvc.perform(post("/bookstore/admin/book").content(jsonDto)
+        bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        list.add(bookDTO);
+        String toJson = gson.toJson(bookDTO);
+        when(adminService.addBook(any())).thenReturn("Added");
+        this.mockMvc.perform(post("/bookstore/admin/book").content(toJson)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 
