@@ -80,4 +80,14 @@ class AdminControllerTest {
         int status = mvcResult.getResponse().getStatus();
         Assert.assertEquals(400, status);
     }
+
+    @Test
+    void givenImageAsMultipart_shouldReturnImageViewURL() throws Exception {
+        MockMultipartFile imageFile = new MockMultipartFile("file", "1.jpg",
+                "image/jpg", "Some data".getBytes());
+        MvcResult result = this.mockMvc.perform(multipart("/bookstore/admin/image")
+                .file(imageFile))
+                .andReturn();
+        Assert.assertEquals(200, result.getResponse().getStatus());
+    }
 }

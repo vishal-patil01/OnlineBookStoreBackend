@@ -7,6 +7,7 @@ import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.service.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AdminService implements IAdminService {
@@ -26,5 +27,10 @@ public class AdminService implements IAdminService {
         }
         bookRepository.save(book);
         return "Book Added successfully.";
+    }
+
+    @Override
+    public String uploadImage(MultipartFile file) {
+        return null;
     }
 }

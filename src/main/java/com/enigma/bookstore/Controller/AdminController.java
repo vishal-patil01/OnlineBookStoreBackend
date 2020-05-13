@@ -29,4 +29,11 @@ public class AdminController {
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/image")
+    public ResponseEntity<Response> uploadImage(@RequestParam("file") MultipartFile file) {
+        String fileDownloadURL = adminService.uploadImage(file);
+        Response response = new Response("Image Loaded Successfully", fileDownloadURL, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
