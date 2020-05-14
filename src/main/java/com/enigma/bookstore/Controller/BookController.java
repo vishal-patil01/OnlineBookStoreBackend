@@ -31,4 +31,14 @@ public class BookController {
         Response response = new Response("Book fetch Successfully", books, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @SneakyThrows
+    @GetMapping("image/{fileName}")
+    public ResponseEntity<Resource> loadImage(@PathVariable String fileName, HttpServletRequest request) {
+        Resource resource = iBookStoreService.loadImages(fileName);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(request.getServletContext().getMimeType(resource.getFile().getAbsolutePath())))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 }
