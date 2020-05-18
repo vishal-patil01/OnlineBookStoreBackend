@@ -269,7 +269,7 @@ public class EmailTemplateGenerator {
                 "\n" +
                 "        <div style='display: flex;border:none; align-items: center;justify-content;margin-bottom:2%;margin-top:2%'>\n" +
                 "<a style='text-decoration: none;border:none;' href='" + httpServletRequest.getHeader("origin") + "/verify/email/?token=" + generateToken + "'>"
-                + "<button class='linkButton'>verify Your Email</button>" +
+                + "<button class='linkButton'>Verify Your Email</button>" +
                 "</a>" +
                 "        </div>\n" +
                 "\n";

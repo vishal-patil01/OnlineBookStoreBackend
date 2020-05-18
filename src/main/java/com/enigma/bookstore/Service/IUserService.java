@@ -4,4 +4,5 @@ import com.enigma.bookstore.dto.UserRegistrationDTO;
 
 public interface IUserService {
     String userRegistration(UserRegistrationDTO userRegistrationDTO);
+    String sendEmailWithTokenLink(String email);
 }

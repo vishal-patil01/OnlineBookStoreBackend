@@ -2,6 +2,8 @@ package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.exception.BookException;
+import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.service.implementation.UserService;
 import com.google.gson.Gson;
@@ -49,14 +51,37 @@ public class UserControllerTest {
         UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
         User userDetails = new User(registrationDTO);
         String stringConvertDTO = gson.toJson(userDetails);
-        String message = "REGISTRATION SUCCESSFUL";
-        when(userService.userRegistration(any())).thenReturn(message);
-        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/register").contentType(MediaType.APPLICATION_JSON)
+        when(userService.userRegistration(any())).thenThrow(new UserException("User With This Email Address Already Exists"));
+        try {
+            this.mockMvc.perform(post("/bookstore/user/register").contentType(MediaType.APPLICATION_JSON)
+                    .content(stringConvertDTO)).andReturn();
+        } catch (BookException e) {
+            Assert.assertEquals("User With This Email Address Already Exists", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenEmailForResendVerificationEmail_WhenEmailIsExists_ShouldReturnVerificationEmailSent() throws Exception {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        User userDetails = new User(registrationDTO);
+        String stringConvertDTO = gson.toJson(userDetails);
+        String message = "Verification Email Has Been Sent";
+        when(userService.sendEmailWithTokenLink(any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/resend/email/"+registrationDTO.email).contentType(MediaType.APPLICATION_JSON)
                 .content(stringConvertDTO)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
+    }
+    @Test
+    void givenEmailForResendVerificationEmail_WhenEmailNotExists_ShouldThrowEmailNotExists() throws Exception {
+        when(userService.userRegistration(any())).thenThrow(new UserException("Email Address Not Exists"));
+        try {
+            this.mockMvc.perform(post("/bookstore/user/resend/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        } catch (BookException e) {
+            Assert.assertEquals("Email Address Not Exists", e.getMessage());
+        }
     }
 }
 

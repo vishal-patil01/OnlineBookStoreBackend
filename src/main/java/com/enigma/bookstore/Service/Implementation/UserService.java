@@ -25,6 +25,18 @@ public class UserService implements IUserService {
     @Autowired
     private IUserRepository userRepository;
 
+    @Autowired
+    private JWTToken jwtToken;
+
+    @Autowired
+    IMailService mailService;
+
+    @Autowired
+    public HttpServletRequest httpServletRequest;
+
+    @Autowired
+    public EmailTemplateGenerator emailTemplateGenerator;
+
     @Override
     public String userRegistration(UserRegistrationDTO userRegistrationDTO) {
         boolean isUserPresent = userRepository.findByEmail(userRegistrationDTO.email).isPresent();
@@ -35,5 +47,34 @@ public class UserService implements IUserService {
         user.setPassword(password);
         userRepository.save(user);
         return "Registration Successful";
+    }
+
+    @Override
+    public String sendEmailWithTokenLink(String email) {
+        User user = getUser(email);
+        Date expirationTime = getExpirationTime(Calendar.MINUTE, 10);
+        String generateToken = jwtToken.generateToken(user.getId(), expirationTime);
+        String url = emailTemplateGenerator.getHeader(user.getFullName()) + getURL(generateToken) + emailTemplateGenerator.getFooter();
+        String emailSubject = getEmailSubject();
+        return mailService.sendEmail(email, emailSubject, url);
+    }
+
+    private Date getExpirationTime(Integer timePeriod, Integer value) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(timePeriod, value);
+        return calendar.getTime();
+    }
+
+    private User getUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException("Account With This Email Address Not Exist"));
+    }
+
+    private String getURL(String generateToken) {
+        return emailTemplateGenerator.getVerifyEmailTemplate(generateToken);
+    }
+
+    private String getEmailSubject() {
+        return "Verify Your Email";
     }
 }

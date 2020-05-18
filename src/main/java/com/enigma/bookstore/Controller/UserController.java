@@ -32,4 +32,12 @@ public class UserController {
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/resend/email/{email}")
+    public ResponseEntity<Response> sendEmailWithTokenLink(@PathVariable(name = "email") String email) {
+        String message = userService.sendEmailWithTokenLink(email);
+        Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
