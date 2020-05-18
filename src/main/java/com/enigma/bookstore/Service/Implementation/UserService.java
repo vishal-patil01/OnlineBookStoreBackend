@@ -5,11 +5,16 @@ import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.IUserService;
+import com.enigma.bookstore.util.EmailTemplateGenerator;
+import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.util.implementation.JWTToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class UserService implements IUserService {
