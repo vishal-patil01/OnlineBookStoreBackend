@@ -56,5 +56,23 @@ public class UserServiceTest {
         String existingBook = userService.userRegistration(registrationDTO);
         Assert.assertEquals("Registration Successful", existingBook);
     }
+    @Test
+    void givenEmail_WhenEmailAddressExistsInDatabase_ShouldReturnVerificationEmailHasBeenSent() {
+        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(new User()));
+        when(mailService.sendEmail(any(), any(), any())).thenReturn("Mail Sent Successfully");
+        String existingBook = userService.sendEmailWithTokenLink("Sam@gmail.com");
+        Assert.assertEquals("Mail Sent Successfully", existingBook);
+    }
+
+    @Test
+    void givenEmailForResendVerificationEmail_WhenEmailNotExists_ShouldThrowEmailNotExists() {
+        try {
+            when(iUserRepository.findByEmail(any())).thenThrow(new UserException("Account With This Email Address Not Exist"));
+            when(userService.sendEmailWithTokenLink(any())).thenThrow(new UserException("Account With This Email Address Not Exist"));
+            userService.sendEmailWithTokenLink("sam@gmail.com");
+        } catch (Exception e) {
+            Assert.assertEquals("Account With This Email Address Not Exist", e.getMessage());
+        }
+    }
 }
 

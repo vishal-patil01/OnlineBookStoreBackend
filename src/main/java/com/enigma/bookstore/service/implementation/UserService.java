@@ -61,7 +61,13 @@ public class UserService implements IUserService {
 
     @Override
     public String verifyEmail(String token) {
-       return null;
+        int userId = jwtToken.verifyToken(token);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException("User Not Found"));
+        if (user.isEmailVerified())
+            throw new UserException("Email Already Verified");
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        return "Email Address Verified";
     }
 
     private Date getExpirationTime(Integer timePeriod, Integer value) {
