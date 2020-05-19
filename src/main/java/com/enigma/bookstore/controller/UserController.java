@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @CrossOrigin(origins = "*", exposedHeaders = "*,")
@@ -40,4 +41,10 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PutMapping("/verify/email/")
+    public ResponseEntity<Response> verifyEmail(@RequestParam(value = "token", defaultValue = "") String token) {
+        String message= userService.verifyEmail(token);
+        Response response = new Response(message,null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

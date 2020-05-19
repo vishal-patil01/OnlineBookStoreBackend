@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
@@ -62,26 +63,43 @@ public class UserControllerTest {
 
     @Test
     void givenEmailForResendVerificationEmail_WhenEmailIsExists_ShouldReturnVerificationEmailSent() throws Exception {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
-        User userDetails = new User(registrationDTO);
-        String stringConvertDTO = gson.toJson(userDetails);
         String message = "Verification Email Has Been Sent";
         when(userService.sendEmailWithTokenLink(any())).thenReturn(message);
-        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/resend/email/"+registrationDTO.email).contentType(MediaType.APPLICATION_JSON)
-                .content(stringConvertDTO)).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/resend/email/sam@gmail.com")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
     }
+
     @Test
     void givenEmailForResendVerificationEmail_WhenEmailNotExists_ShouldThrowEmailNotExists() throws Exception {
-        when(userService.userRegistration(any())).thenThrow(new UserException("Email Address Not Exists"));
+        when(userService.sendEmailWithTokenLink(any())).thenThrow(new UserException("Email Address Not Exists"));
         try {
             this.mockMvc.perform(post("/bookstore/user/resend/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
-        } catch (BookException e) {
+        } catch (UserException e) {
             Assert.assertEquals("Email Address Not Exists", e.getMessage());
         }
     }
-}
 
+    @Test
+    void givenValidEmailAndValidToken_WhenEmailIsExists_ShouldReturnEmailAddressVerified() throws Exception {
+        String message = "Email Address Verified";
+        when(userService.verifyEmail(any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(put("/bookstore/user/verify/email/")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenValidEmailAndValidToken_WhenEmailIsExistsAndIsEmailVerified_ShouldReturnEmailAlreadyVerified() throws Exception {
+        when(userService.verifyEmail(any())).thenThrow(new UserException("Email Already Verified"));
+        try {
+            this.mockMvc.perform(post("/bookstore/user/verify/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        } catch (UserException e) {
+            Assert.assertEquals("Email Already Verified", e.getMessage());
+        }
+    }
+}

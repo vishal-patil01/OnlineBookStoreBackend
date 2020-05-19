@@ -59,6 +59,11 @@ public class UserService implements IUserService {
         return mailService.sendEmail(email, emailSubject, url);
     }
 
+    @Override
+    public String verifyEmail(String token) {
+       return null;
+    }
+
     private Date getExpirationTime(Integer timePeriod, Integer value) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(timePeriod, value);
