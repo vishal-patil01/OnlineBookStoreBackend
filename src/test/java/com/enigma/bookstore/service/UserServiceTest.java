@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
@@ -14,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -24,9 +26,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
 
-    @MockBean
-    IUserRepository iUserRepository;
-
     @Autowired
     UserService userService;
 
@@ -35,6 +34,12 @@ public class UserServiceTest {
 
     @MockBean
     IMailService mailService;
+
+    @MockBean
+    IUserRepository iUserRepository;
+
+    @MockBean
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
     void givenUserRegistrationData_WhenEmailIdAllReadyExist_ShouldReturnEmailIdAlreadyPresentMessage() {
@@ -76,5 +81,54 @@ public class UserServiceTest {
         }
     }
 
+    @Test
+    void givenUserLoginDTO_WhenAllValidationAreTrue_ShouldReturnLoginSuccessfulMessage() {
+        UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        User user = new User(registrationDTO);
+        user.setEmailVerified(true);
+        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(bCryptPasswordEncoder.matches(any(), any())).thenReturn(true);
+        when(jwtToken.generateToken(any(), any())).thenReturn("token");
+        String existingBook = userService.userLogin(userLoginDTO);
+        Assert.assertEquals("token", existingBook);
+    }
+
+    @Test
+    void givenUserLoginDTO_WhenEmailAddressIsNotExists_ShouldThrowUserException() {
+        UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+        try {
+            when(iUserRepository.findByEmail(any())).thenThrow(new UserException("Email Address Not Exists"));
+            userService.userLogin(userLoginDTO);
+        } catch (UserException e) {
+            Assert.assertEquals("Email Address Not Exists", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenUserLoginDTO_WhenEmailAddressIsExistsButPasswordNotMatches_ShouldThrowUserException() {
+        try {
+            UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+            UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+            User user = new User(registrationDTO);
+            user.setEmailVerified(true);
+            when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+            when(bCryptPasswordEncoder.matches(any(), any())).thenReturn(false);
+            userService.userLogin(userLoginDTO);
+        } catch (UserException e) {
+            Assert.assertEquals("Enter Valid Password", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenUserLoginDTO_WhenEmailAddressIsNotVerified_ShouldThrowUserException() {
+        try {
+            UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+            when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(new User()));
+            userService.userLogin(userLoginDTO);
+        } catch (UserException e) {
+            Assert.assertEquals("First Verify Your Email Address", e.getMessage());
+        }
+    }
 }
 

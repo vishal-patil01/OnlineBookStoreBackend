@@ -52,7 +52,16 @@ public class UserService implements IUserService {
 
     @Override
     public String userLogin(UserLoginDTO userLoginDTO) {
-        return null;
+        User user = getUser(userLoginDTO.email);
+        if (user.isEmailVerified()) {
+            boolean isPasswordMatched = bCryptPasswordEncoder.matches(userLoginDTO.password, user.getPassword());
+            if (isPasswordMatched) {
+                Date expirationTime = getExpirationTime(Calendar.DAY_OF_YEAR, 1);
+                return jwtToken.generateToken(user.getId(), expirationTime);
+            }
+            throw new UserException("Enter Valid Password");
+        }
+        throw new UserException("First Verify Your Email Address");
     }
 
     @Override
