@@ -1,6 +1,7 @@
 package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.service.IUserService;
@@ -45,6 +46,16 @@ public class UserController {
     public ResponseEntity<Response> verifyEmail(@RequestParam(value = "token", defaultValue = "") String token) {
         String message= userService.verifyEmail(token);
         Response response = new Response(message,null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Response> login(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletResponse httpServletResponse, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
+        String token = userService.userLogin(userLoginDTO);
+        httpServletResponse.setHeader("authorization", token);
+        Response response = new Response("Login Successful", null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

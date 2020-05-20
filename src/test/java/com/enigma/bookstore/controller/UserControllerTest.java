@@ -1,6 +1,7 @@
 package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.exception.UserException;
@@ -100,6 +101,50 @@ public class UserControllerTest {
             this.mockMvc.perform(post("/bookstore/user/verify/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
         } catch (UserException e) {
             Assert.assertEquals("Email Already Verified", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenUserLoginData_WhenAllValidationAreTrueAndEmailExists_ShouldReturnLoginSuccessfulMessage() throws Exception {
+        UserLoginDTO loginDTO = new UserLoginDTO("sam@gmail.com", "Asdfg@123");
+        String stringConvertDTO = gson.toJson(loginDTO);
+        String message = "Login Successful";
+        when(userService.userLogin(any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/login").contentType(MediaType.APPLICATION_JSON)
+                .content(stringConvertDTO)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenLoginData_WhenEmailIdIsValidButPasswordIsInvalid_ShouldThrowUserExceptions() throws Exception {
+        when(userService.verifyEmail(any())).thenThrow(new UserException("Enter Valid Password"));
+        try {
+            this.mockMvc.perform(post("/bookstore/user/login").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        } catch (UserException e) {
+            Assert.assertEquals("Enter Valid Password", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenLoginData_WhenPasswordIsValidButEmailIdIsNotVerified_ShouldThrowUserExceptions() throws Exception {
+        when(userService.verifyEmail(any())).thenThrow(new UserException("First Verify Your Email Address"));
+        try {
+            this.mockMvc.perform(post("/bookstore/user/login").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        } catch (UserException e) {
+            Assert.assertEquals("First Verify Your Email Address", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenLoginData_WhenEmailIdIsNotRegistered_ShouldThrowUserException() throws Exception {
+        when(userService.verifyEmail(any())).thenThrow(new UserException("Account With This Email Address Not Exist"));
+        try {
+            this.mockMvc.perform(post("/bookstore/user/verify/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        } catch (UserException e) {
+            Assert.assertEquals("Account With This Email Address Not Exist", e.getMessage());
         }
     }
 }

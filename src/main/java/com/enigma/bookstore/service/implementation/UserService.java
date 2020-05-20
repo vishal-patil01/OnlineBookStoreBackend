@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service.implementation;
 
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
@@ -47,6 +48,11 @@ public class UserService implements IUserService {
         user.setPassword(password);
         userRepository.save(user);
         return "Registration Successful";
+    }
+
+    @Override
+    public String userLogin(UserLoginDTO userLoginDTO) {
+        return null;
     }
 
     @Override
