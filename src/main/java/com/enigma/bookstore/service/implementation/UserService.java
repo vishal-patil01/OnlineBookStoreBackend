@@ -34,13 +34,10 @@ public class UserService implements IUserService {
     IMailService mailService;
 
     @Autowired
-    public HttpServletRequest httpServletRequest;
-
-    @Autowired
     public EmailTemplateGenerator emailTemplateGenerator;
 
     @Override
-    public String userRegistration(UserRegistrationDTO userRegistrationDTO) {
+    public String userRegistration(UserRegistrationDTO userRegistrationDTO, HttpServletRequest httpServletRequest) {
         boolean isUserPresent = userRepository.findByEmail(userRegistrationDTO.email).isPresent();
         if (isUserPresent)
             throw new UserException("User With This Email Address Already Exists");
@@ -48,6 +45,8 @@ public class UserService implements IUserService {
         User user = new User(userRegistrationDTO);
         user.setPassword(password);
         userRepository.save(user);
+        String token = jwtToken.generateToken(user.getId(), getExpirationTime(Calendar.MINUTE, 10));
+        mailService.sendEmail(user.getEmail(), getEmailSubject(httpServletRequest), getURL(token, httpServletRequest));
         return "Registration Successful";
     }
 
@@ -66,12 +65,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String sendEmailWithTokenLink(String email) {
+    public String sendEmailWithTokenLink(String email, HttpServletRequest httpServletRequest) {
         User user = getUser(email);
         Date expirationTime = getExpirationTime(Calendar.MINUTE, 10);
         String generateToken = jwtToken.generateToken(user.getId(), expirationTime);
-        String url = emailTemplateGenerator.getHeader(user.getFullName()) + getURL(generateToken) + emailTemplateGenerator.getFooter();
-        String emailSubject = getEmailSubject();
+        String url = emailTemplateGenerator.getHeader(user.getFullName()) + getURL(generateToken, httpServletRequest) + emailTemplateGenerator.getFooter();
+        String emailSubject = getEmailSubject(httpServletRequest);
         mailService.sendEmail(email, emailSubject, url);
         return "Verification Email Has Been Sent";
     }
@@ -89,7 +88,7 @@ public class UserService implements IUserService {
 
     @Override
     public String resetPassword(ResetPasswordDTO resetPasswordDTO, String token) {
-      return null;
+       return null;
     }
 
     private Date getExpirationTime(Integer timePeriod, Integer value) {
@@ -103,11 +102,11 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new UserException("Account With This Email Address Not Exist"));
     }
 
-    private String getURL(String generateToken) {
+    private String getURL(String generateToken, HttpServletRequest httpServletRequest) {
         return emailTemplateGenerator.getVerifyEmailTemplate(generateToken);
     }
 
-    private String getEmailSubject() {
+    private String getEmailSubject(HttpServletRequest httpServletRequest) {
         return "Verify Your Email";
     }
 }

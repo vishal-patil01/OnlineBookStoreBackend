@@ -41,7 +41,7 @@ public class UserControllerTest {
         User userDetails = new User(registrationDTO);
         String stringConvertDTO = gson.toJson(userDetails);
         String message = "REGISTRATION SUCCESSFUL";
-        when(userService.userRegistration(any())).thenReturn(message);
+        when(userService.userRegistration(any(), any())).thenReturn(message);
         MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/register").contentType(MediaType.APPLICATION_JSON)
                 .content(stringConvertDTO)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
@@ -55,7 +55,7 @@ public class UserControllerTest {
         UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
         User userDetails = new User(registrationDTO);
         String stringConvertDTO = gson.toJson(userDetails);
-        when(userService.userRegistration(any())).thenThrow(new UserException("User With This Email Address Already Exists"));
+        when(userService.userRegistration(any(), any())).thenThrow(new UserException("User With This Email Address Already Exists"));
         try {
             this.mockMvc.perform(post("/bookstore/user/register").contentType(MediaType.APPLICATION_JSON)
                     .content(stringConvertDTO)).andReturn();
@@ -67,7 +67,7 @@ public class UserControllerTest {
     @Test
     void givenEmailForResendVerificationEmail_WhenEmailIsExists_ShouldReturnVerificationEmailSent() throws Exception {
         String message = "Verification Email Has Been Sent";
-        when(userService.sendEmailWithTokenLink(any())).thenReturn(message);
+        when(userService.sendEmailWithTokenLink(any(), any())).thenReturn(message);
         MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/resend/email/sam@gmail.com")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Response responseDto = gson.fromJson(response, Response.class);
@@ -77,7 +77,7 @@ public class UserControllerTest {
 
     @Test
     void givenEmailForResendVerificationEmail_WhenEmailNotExists_ShouldThrowEmailNotExists() throws Exception {
-        when(userService.sendEmailWithTokenLink(any())).thenThrow(new UserException("Email Address Not Exists"));
+        when(userService.sendEmailWithTokenLink(any(), any())).thenThrow(new UserException("Email Address Not Exists"));
         try {
             this.mockMvc.perform(post("/bookstore/user/resend/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
         } catch (UserException e) {
@@ -170,7 +170,7 @@ public class UserControllerTest {
             when(userService.resetPassword(any(), any())).thenThrow(new JWTException("Token Expired"));
             this.mockMvc.perform(post("/bookstore/user/reset/password/").contentType(MediaType.APPLICATION_JSON)).andReturn();
         } catch (JWTException e) {
-            Assert.assertEquals("Tken Expired", e.getMessage());
+            Assert.assertEquals("Token Expired", e.getMessage());
         }
     }
 }

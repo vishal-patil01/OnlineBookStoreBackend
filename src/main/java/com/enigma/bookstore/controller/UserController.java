@@ -31,14 +31,14 @@ public class UserController {
     public ResponseEntity<Response> register(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BookException("Invalid Data !!! Please Enter Correct Data");
-        String message = userService.userRegistration(userRegistrationDTO);
+        String message = userService.userRegistration(userRegistrationDTO,httpServletRequest);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/resend/email/{email}")
     public ResponseEntity<Response> sendEmailWithTokenLink(@PathVariable(name = "email") String email) {
-        String message = userService.sendEmailWithTokenLink(email);
+        String message = userService.sendEmailWithTokenLink(email,httpServletRequest);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
