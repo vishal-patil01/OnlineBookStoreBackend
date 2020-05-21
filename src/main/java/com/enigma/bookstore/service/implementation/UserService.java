@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service.implementation;
 
+import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.UserException;
@@ -71,7 +72,8 @@ public class UserService implements IUserService {
         String generateToken = jwtToken.generateToken(user.getId(), expirationTime);
         String url = emailTemplateGenerator.getHeader(user.getFullName()) + getURL(generateToken) + emailTemplateGenerator.getFooter();
         String emailSubject = getEmailSubject();
-        return mailService.sendEmail(email, emailSubject, url);
+        mailService.sendEmail(email, emailSubject, url);
+        return "Verification Email Has Been Sent";
     }
 
     @Override
@@ -83,6 +85,11 @@ public class UserService implements IUserService {
         user.setEmailVerified(true);
         userRepository.save(user);
         return "Email Address Verified";
+    }
+
+    @Override
+    public String resetPassword(ResetPasswordDTO resetPasswordDTO, String token) {
+      return null;
     }
 
     private Date getExpirationTime(Integer timePeriod, Integer value) {

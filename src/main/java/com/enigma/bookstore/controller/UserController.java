@@ -1,5 +1,6 @@
 package com.enigma.bookstore.controller;
 
+import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
@@ -44,8 +45,8 @@ public class UserController {
 
     @PutMapping("/verify/email/")
     public ResponseEntity<Response> verifyEmail(@RequestParam(value = "token", defaultValue = "") String token) {
-        String message= userService.verifyEmail(token);
-        Response response = new Response(message,null, 200);
+        String message = userService.verifyEmail(token);
+        Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -56,6 +57,15 @@ public class UserController {
         String token = userService.userLogin(userLoginDTO);
         httpServletResponse.setHeader("authorization", token);
         Response response = new Response("Login Successful", null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/reset/password/")
+    public ResponseEntity<Response> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO, @RequestParam(value = "token", defaultValue = "") String token, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            throw new BookException("Invalid Data !!! Please Enter Valid Password");
+        String message = userService.resetPassword(resetPasswordDTO, token);
+        Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 
@@ -8,4 +9,5 @@ public interface IUserService {
     String sendEmailWithTokenLink(String email);
     String verifyEmail(String token);
     String userLogin(UserLoginDTO userLoginDTO);
+    String resetPassword(ResetPasswordDTO pass, String token);
 }

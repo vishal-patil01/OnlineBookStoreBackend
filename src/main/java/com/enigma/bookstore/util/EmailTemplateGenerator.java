@@ -274,4 +274,17 @@ public class EmailTemplateGenerator {
                 "        </div>\n" +
                 "\n";
     }
+
+    public String getResetPasswordTemplate(String generateToken) {
+        return "        <p>You can reset your password by clicking on following button \n" +
+                "        <p>If you have any questions,Mail us at bookstore.engima@gmail.com</p>\n" +
+                "\n" +
+                "\n" +
+                "        <div style='display: flex;border:none; align-items: center;justify-content;margin-bottom:2%;margin-top:2%'>\n" +
+                "<a style='text-decoration: none;border:none;' href='" + httpServletRequest.getHeader("origin") + "/reset/password/?token=" + generateToken + "'>"
+                + "<button class='linkButton'>Reset Your Password</button>" +
+                "</a>" +
+                "        </div>\n" +
+                "\n";
+    }
 }

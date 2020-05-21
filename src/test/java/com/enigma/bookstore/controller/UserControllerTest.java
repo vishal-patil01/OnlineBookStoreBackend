@@ -1,9 +1,11 @@
 package com.enigma.bookstore.controller;
 
+import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.BookException;
+import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.service.implementation.UserService;
@@ -145,6 +147,30 @@ public class UserControllerTest {
             this.mockMvc.perform(post("/bookstore/user/verify/email/sam@gmail.com").contentType(MediaType.APPLICATION_JSON)).andReturn();
         } catch (UserException e) {
             Assert.assertEquals("Account With This Email Address Not Exist", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenRestPasswordDTO_WhenTokenIsValid_ShouldReturnPasswordChangedSuccessfullyMessage() throws Exception {
+        ResetPasswordDTO loginDTO = new ResetPasswordDTO("Asdfg@123");
+        String stringConvertDTO = gson.toJson(loginDTO);
+        String message = "Password Changed Successfully ";
+        when(userService.resetPassword(any(), any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/reset/password/").contentType(MediaType.APPLICATION_JSON)
+                .content(stringConvertDTO)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenRestPasswordDTO_WhenTokenIsNotValid_ShouldThrowJwtTokenException() throws Exception {
+        try {
+            when(userService.resetPassword(any(), any())).thenThrow(new JWTException("Token Expired"));
+            this.mockMvc.perform(post("/bookstore/user/reset/password/").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        } catch (JWTException e) {
+            Assert.assertEquals("Tken Expired", e.getMessage());
         }
     }
 }
