@@ -85,10 +85,14 @@ public class UserService implements IUserService {
         userRepository.save(user);
         return "Email Address Verified";
     }
-
     @Override
     public String resetPassword(ResetPasswordDTO resetPasswordDTO, String token) {
-       return null;
+        int userId = jwtToken.verifyToken(token);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException("User Not Found"));
+        String password = bCryptPasswordEncoder.encode(resetPasswordDTO.password);
+        user.setPassword(password);
+        userRepository.save(user);
+        return "Password Reset Successfully";
     }
 
     private Date getExpirationTime(Integer timePeriod, Integer value) {
@@ -103,10 +107,14 @@ public class UserService implements IUserService {
     }
 
     private String getURL(String generateToken, HttpServletRequest httpServletRequest) {
+        if (httpServletRequest.getHeader("Referer").contains("forget"))
+            return emailTemplateGenerator.getResetPasswordTemplate(generateToken);
         return emailTemplateGenerator.getVerifyEmailTemplate(generateToken);
     }
 
     private String getEmailSubject(HttpServletRequest httpServletRequest) {
+        if (httpServletRequest.getHeader("Referer").contains("forget"))
+            return "Reset Password";
         return "Verify Your Email";
     }
 }
