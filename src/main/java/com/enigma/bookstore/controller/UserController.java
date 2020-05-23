@@ -5,6 +5,7 @@ import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.BookException;
+import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<Response> register(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            throw new BookException("Invalid Data !!! Please Enter Correct Data");
+            throw new UserException("Invalid Data !!! Please Enter Correct Data");
         String message = userService.userRegistration(userRegistrationDTO,httpServletRequest);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
