@@ -14,20 +14,26 @@ public class BookStoreExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
 
-    @ExceptionHandler(UserException.class)
-    public ResponseEntity<Response> onlineBookStoreExceptionHandler(UserException e) {
-        Response response = new Response(e.getMessage(), null, 208);
-        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
-    }
-
     @ExceptionHandler(JWTException.class)
     public ResponseEntity<Response> onlineBookStoreExceptionHandler(JWTException e) {
         Response response = new Response(e.getMessage(), null, 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
 
-    @ExceptionHandler(MailServiceException.class)
-    public ResponseEntity<Response> onlineBookStoreExceptionHandler(MailServiceException e) {
+    @ExceptionHandler(CartException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(CartException e) {
+        Response response = new Response(e.getMessage(), null, 208);
+        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
+    }
+
+    @ExceptionHandler(CartItemsException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(CartItemsException e) {
+        Response response = new Response(e.getMessage(), null, 208);
+        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(UserException e) {
         Response response = new Response(e.getMessage(), null, 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }

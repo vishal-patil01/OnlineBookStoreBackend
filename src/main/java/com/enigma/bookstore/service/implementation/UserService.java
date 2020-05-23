@@ -6,6 +6,7 @@ import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.repository.IUserRepository;
+import com.enigma.bookstore.service.ICartService;
 import com.enigma.bookstore.service.IUserService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
@@ -35,6 +36,9 @@ public class UserService implements IUserService {
 
     @Autowired
     public EmailTemplateGenerator emailTemplateGenerator;
+
+    @Autowired
+    ICartService cartService;
 
     @Override
     public String userRegistration(UserRegistrationDTO userRegistrationDTO, HttpServletRequest httpServletRequest) {
@@ -83,8 +87,10 @@ public class UserService implements IUserService {
             throw new UserException("Email Already Verified");
         user.setEmailVerified(true);
         userRepository.save(user);
+        cartService.createCart(user);
         return "Email Address Verified";
     }
+
     @Override
     public String resetPassword(ResetPasswordDTO resetPasswordDTO, String token) {
         int userId = jwtToken.verifyToken(token);

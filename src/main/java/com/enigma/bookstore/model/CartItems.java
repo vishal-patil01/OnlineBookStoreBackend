@@ -23,8 +23,15 @@ public class CartItems {
     private Integer quantity;
     @CreationTimestamp
     private Timestamp addedToCartDate;
-    private Object book;
-    private Object cart;
+
+    @ManyToOne()
+    @JoinColumn(name = "bookId")
+    private Book book;
+
+    @JsonIgnore
+    @ManyToOne()
+    @JoinColumn(name = "cartId")
+    private Cart cart;
 
     public CartItems(CartDTO cartDTO, Book book, Cart cart) {
         this.quantity = cartDTO.quantity;
