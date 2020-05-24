@@ -57,7 +57,11 @@ public class CartService implements ICartService {
 
     @Override
     public List<CartItems> fetchCart(String token) {
-        return null;
+        Cart cart = checkUserAndCartIsExists(token);
+        List<CartItems> cartItemsList = cartItemsRepository.findAllByCart_CardId(cart.getCardId());
+        if (cartItemsList.isEmpty())
+            throw new CartItemsException("There Are In Items In A Cart");
+        return cartItemsList;
     }
 
     private Cart checkUserAndCartIsExists(String token) {

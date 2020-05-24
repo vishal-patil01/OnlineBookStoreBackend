@@ -106,5 +106,21 @@ public class CartControllerTest {
         Assert.assertTrue(response.contains(message));
     }
 
+    @Test
+    void givenCartData_WhenNoItemsPresentInCart_ShouldThrowCartItemException() throws Exception {
+        CartDTO cartDTO = new CartDTO(1, 2);
+        bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        CartItems cartBook = new CartItems(cartDTO, book, cart);
+        String jsonData = gson.toJson(cartBook);
+        String message = "There Are In Items In A Cart";
+        when(cartService.fetchCart(any())).thenThrow(new CartItemsException("There Are In Items In A Cart"));
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/cart/").contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
 }
 

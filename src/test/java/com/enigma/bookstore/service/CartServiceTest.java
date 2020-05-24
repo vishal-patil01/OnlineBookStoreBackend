@@ -130,4 +130,50 @@ public class CartServiceTest {
             Assert.assertEquals("User Not Found", e.getMessage());
         }
     }
+
+    @Test
+    void givenRequest_WhenGetResponse_ShouldReturnCartData() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+        when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
+        when(cartItemsRepository.findAllByCart_CardId(1)).thenReturn(cartList);
+        List<CartItems> itemsList = cartService.fetchCart("token");
+        Assert.assertEquals(cartList, itemsList);
+    }
+
+    @Test
+    void givenRequestToFetchCartList_WhenCartIsEmpty_ShouldThrowCartItemException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+            when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
+            when(cartItemsRepository.findAllByCart_CardId(1)).thenThrow(new CartItemsException("There Are In Items In A Cart"));
+            cartService.fetchCart("token");
+        } catch (CartItemsException e) {
+            Assert.assertEquals("There Are In Items In A Cart", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenRequestToFetchCartList_WhenCartIsNotFound_ShouldThrowCartException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+            when(cartRepository.findByUserId(any())).thenThrow(new CartException("Cart Not Found"));
+            cartService.addToCart(cartDTO, "authorization");
+        } catch (CartException e) {
+            Assert.assertEquals("Cart Not Found", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenRequestToFetchCartList_WhenUserIsNotFound_ShouldThrowUserException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenThrow(new UserException("User Not Found"));
+            cartService.fetchCart("authorization");
+        } catch (UserException e) {
+            Assert.assertEquals("User Not Found", e.getMessage());
+        }
+    }
 }
