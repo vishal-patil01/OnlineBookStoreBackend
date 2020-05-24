@@ -55,6 +55,11 @@ public class CartService implements ICartService {
         throw new CartItemsException("Book Already Exists In Cart");
     }
 
+    @Override
+    public List<CartItems> fetchCart(String token) {
+        return null;
+    }
+
     private Cart checkUserAndCartIsExists(String token) {
         int userId = jwtToken.verifyToken(token);
         userRepository.findById(userId)

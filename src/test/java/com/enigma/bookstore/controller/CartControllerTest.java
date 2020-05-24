@@ -4,7 +4,6 @@ import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CartDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.exception.BookException;
-import com.enigma.bookstore.exception.CartException;
 import com.enigma.bookstore.exception.CartItemsException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.Cart;
@@ -20,8 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(CartController.class)
@@ -70,6 +73,7 @@ public class CartControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
     }
+
     @Test
     void givenCartData_WhenBookNotFound_ShouldThrowBookException() throws Exception {
         CartDTO cartDTO = new CartDTO(1, 2);
@@ -86,5 +90,21 @@ public class CartControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
     }
+
+    @Test
+    void givenRequest_WhenCartIsNotEmpty_ShouldReturnCartRecords() throws Exception {
+        CartDTO cartDTO = new CartDTO(1, 2);
+        bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        CartItems cartBook = new CartItems(cartDTO, book, cart);
+        List<CartItems> cartList = new ArrayList<>();
+        cartList.add(cartBook);
+        String message = "Cart Data Fetched Successfully";
+        when(cartService.fetchCart(any())).thenReturn(cartList);
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/cart")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Assert.assertTrue(response.contains(message));
+    }
+
 }
 
