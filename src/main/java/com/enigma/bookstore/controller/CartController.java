@@ -36,4 +36,11 @@ public class CartController {
         Response response = new Response("Cart Data Fetched Successfully", cartData, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("/cart/{cartitemid}")
+    public ResponseEntity<Response> deleteBookFromCart(@PathVariable(name = "cartitemid") Integer cartItemId, @RequestHeader(value = "token", required = false) String token) {
+        String message = bookCartService.deleteBookFromCart(cartItemId, token);
+        Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -12,4 +12,6 @@ public interface ICartService {
     String addToCart(CartDTO bookCartDTO, String token);
 
     List<CartItems> fetchCart(String token);
+
+    String deleteBookFromCart(Integer cartItemId, String token);
 }

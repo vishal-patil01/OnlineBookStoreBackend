@@ -64,6 +64,11 @@ public class CartService implements ICartService {
         return cartItemsList;
     }
 
+    @Override
+    public String deleteBookFromCart(Integer cartItemId, String token) {
+        return null;
+    }
+
     private Cart checkUserAndCartIsExists(String token) {
         int userId = jwtToken.verifyToken(token);
         userRepository.findById(userId)
