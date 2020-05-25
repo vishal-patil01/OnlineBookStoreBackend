@@ -176,4 +176,27 @@ public class CartServiceTest {
             Assert.assertEquals("User Not Found", e.getMessage());
         }
     }
+
+    @Test
+    void givenCartId_WhenGetResponse_ShouldReturnCartDeletedSuccessfullyMessage() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+        when(cartItemsRepository.findById(1)).thenReturn(Optional.ofNullable(cartItems));
+        when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
+        String existingBook = cartService.deleteBookFromCart(1, "token");
+        Assert.assertEquals("Cart Deleted Successfully", existingBook);
+    }
+
+    @Test
+    void givenCartId_WhenItemWithCartItemIdNotExist_ShouldThrowCartItemsException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+            when(cartItemsRepository.findById(1)).thenThrow(new CartItemsException("There Is No Such Item In Cart"));
+            when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
+            cartService.deleteBookFromCart(1, "token");
+        } catch (CartItemsException e) {
+            Assert.assertEquals("There Is No Such Item In Cart", e.getMessage());
+        }
+    }
 }

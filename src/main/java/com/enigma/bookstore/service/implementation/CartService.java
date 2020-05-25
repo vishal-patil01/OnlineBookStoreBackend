@@ -66,7 +66,15 @@ public class CartService implements ICartService {
 
     @Override
     public String deleteBookFromCart(Integer cartItemId, String token) {
-        return null;
+        checkUserAndCartIsExists(token);
+        CartItems cartBook = getCartItems(cartItemId);
+        cartItemsRepository.delete(cartBook);
+        return "Cart Deleted Successfully";
+    }
+
+    private CartItems getCartItems(Integer cartItemId) {
+        return cartItemsRepository.findById(cartItemId)
+                .orElseThrow(() -> new CartItemsException("There Is No Such Item In Cart"));
     }
 
     private Cart checkUserAndCartIsExists(String token) {
