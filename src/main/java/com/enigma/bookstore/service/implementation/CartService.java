@@ -72,6 +72,11 @@ public class CartService implements ICartService {
         return "Cart Deleted Successfully";
     }
 
+    @Override
+    public String updateCartItemQuantity(Integer cartItemId, Integer quantity, String token) {
+        return null;
+    }
+
     private CartItems getCartItems(Integer cartItemId) {
         return cartItemsRepository.findById(cartItemId)
                 .orElseThrow(() -> new CartItemsException("There Is No Such Item In Cart"));

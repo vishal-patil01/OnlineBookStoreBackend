@@ -43,4 +43,12 @@ public class CartController {
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("/cart/{cartitemid}/{quantity}")
+    public ResponseEntity<Response> updateCartBookQuantity(@PathVariable(name = "cartitemid") Integer cartItemId, @PathVariable Integer quantity, @RequestHeader(value = "token", required = false) String token) {
+        String message = bookCartService.updateCartItemQuantity(cartItemId, quantity, token);
+        Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

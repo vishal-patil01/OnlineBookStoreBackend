@@ -133,5 +133,16 @@ public class CartControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
     }
+
+    @Test
+    void givenQuantityAndPrice_ShouldReturnQuantityUpdatedSuccessfullyMessage() throws Exception {
+        String message = "Book Quantity Updated Successfully ";
+        when(cartService.updateCartItemQuantity(anyInt(), anyInt(), any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(put("/bookstore/cart/1/2")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
 }
 
