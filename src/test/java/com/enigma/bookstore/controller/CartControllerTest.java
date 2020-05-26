@@ -144,5 +144,16 @@ public class CartControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
     }
+
+    @Test
+    void givenQuantityAndPrice_WhenQuantityIsInvalid_ShouldThrowBookException() throws Exception {
+        String message = "Insufficient Or Invalid Book Quantity";
+        when(cartService.updateCartItemQuantity(anyInt(), anyInt(), any())).thenThrow(new BookException("Insufficient Or Invalid Book Quantity"));
+        MvcResult mvcResult = this.mockMvc.perform(put("/bookstore/cart/1/-2")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
 }
 

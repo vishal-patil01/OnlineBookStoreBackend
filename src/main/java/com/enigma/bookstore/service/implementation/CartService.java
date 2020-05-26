@@ -74,7 +74,13 @@ public class CartService implements ICartService {
 
     @Override
     public String updateCartItemQuantity(Integer cartItemId, Integer quantity, String token) {
-        return null;
+        checkUserAndCartIsExists(token);
+        CartItems cartItems = getCartItems(cartItemId);
+        if (cartItems.getBook().getNoOfCopies() < quantity || 0 > quantity)
+            throw new BookException("Insufficient Or Invalid Book Quantity");
+        cartItems.setQuantity(quantity);
+        cartItemsRepository.save(cartItems);
+        return "Cart Updated Successfully";
     }
 
     private CartItems getCartItems(Integer cartItemId) {

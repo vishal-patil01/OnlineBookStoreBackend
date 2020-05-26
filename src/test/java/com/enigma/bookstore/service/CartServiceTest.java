@@ -199,4 +199,28 @@ public class CartServiceTest {
             Assert.assertEquals("There Is No Such Item In Cart", e.getMessage());
         }
     }
+
+    @Test
+    void givenCartIdAndQuantity_WhenGetResponse_ShouldReturnCartUpdatedSuccessfullyMessage() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+        when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
+        when(cartItemsRepository.findById(1)).thenReturn(Optional.ofNullable(cartItems));
+        when(cartRepository.save(any())).thenReturn(new CartItems());
+        String existingBook = cartService.updateCartItemQuantity(1, 2, "token");
+        Assert.assertEquals("Cart Updated Successfully", existingBook);
+    }
+
+    @Test
+    void givenCartIdAndQuantity_WhenQuantityIsInvalid_ShouldReturnThrowBookException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+            when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
+            when(cartItemsRepository.findById(1)).thenReturn(Optional.ofNullable(cartItems));
+            cartService.updateCartItemQuantity(1, -2, "token");
+        } catch (BookException e) {
+            Assert.assertEquals("Insufficient Or Invalid Book Quantity", e.getMessage());
+        }
+    }
 }
