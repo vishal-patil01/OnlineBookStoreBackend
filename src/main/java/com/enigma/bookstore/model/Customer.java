@@ -46,7 +46,10 @@ public class Customer {
     @NotNull
     public AddressType customerAddressType;
 
-    Object user;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
     public Customer(CustomerDTO customerDTO, User user){
         this.customerPinCode = customerDTO.customerPinCode;

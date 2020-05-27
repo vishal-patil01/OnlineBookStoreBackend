@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(CustomerController.class)
@@ -47,6 +46,33 @@ public class CustomerControllerTest {
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenCustomerDetails_WhenAllValidationAreTrueAndDetailsExistOfGivenAddressType_ShouldReturnCustomerDetailsUpdateSuccessfullyMessage() throws Exception {
+        CustomerDTO customerDTO = new CustomerDTO(425001, "India", "Shiv Colony", "India", "Near Hotel", AddressType.HOME);
+        Customer customerDetails = new Customer(customerDTO, user);
+        String jsonData = gson.toJson(customerDetails);
+        String message = "Customer Details Updated Successfully";
+        when(customerService.addCustomerDetails(any(), any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/customer").contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenRequest_WhenUserFound_ShouldThrowException() {
+        try {
+            when(customerService.addCustomerDetails(any(), any())).thenThrow(new UserException("User Not Exists"));
+            this.mockMvc.perform(post("/bookstore/customer")).andReturn();
+        } catch (UserException e) {
+            Assert.assertSame("User Not Exists", e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
