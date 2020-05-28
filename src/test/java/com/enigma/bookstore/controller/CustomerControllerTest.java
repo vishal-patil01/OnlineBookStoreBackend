@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(CustomerController.class)
@@ -64,15 +65,26 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void givenRequest_WhenUserFound_ShouldThrowException() {
+    void givenRequest_WhenUserFound_ShouldThrowException() throws Exception {
         try {
             when(customerService.addCustomerDetails(any(), any())).thenThrow(new UserException("User Not Exists"));
             this.mockMvc.perform(post("/bookstore/customer")).andReturn();
         } catch (UserException e) {
             Assert.assertSame("User Not Exists", e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    }
+
+    @Test
+    void givenRequest_WhenCustomer_ShouldReturnCustomerDetails() throws Exception {
+        CustomerDTO customerDTO = new CustomerDTO( 425001, "India", "Shiv Colony", "India", "Near Hotel", AddressType.HOME);
+        Customer customerDetails = new Customer(customerDTO, user);
+        String jsonData = gson.toJson(customerDetails);
+        when(customerService.fetchCustomerDetails(any(), any())).thenReturn(customerDetails);
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/customer/"+AddressType.HOME).contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        Assert.assertEquals("Customer Details Fetched Successfully",responseDto.message);
     }
 }
 

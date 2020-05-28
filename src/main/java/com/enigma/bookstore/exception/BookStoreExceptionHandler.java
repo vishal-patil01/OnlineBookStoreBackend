@@ -20,6 +20,12 @@ public class BookStoreExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
 
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(UserException e) {
+        Response response = new Response(e.getMessage(), null, 208);
+        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
+    }
+
     @ExceptionHandler(CartException.class)
     public ResponseEntity<Response> onlineBookStoreExceptionHandler(CartException e) {
         Response response = new Response(e.getMessage(), null, 208);
@@ -32,8 +38,8 @@ public class BookStoreExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
 
-    @ExceptionHandler(UserException.class)
-    public ResponseEntity<Response> onlineBookStoreExceptionHandler(UserException e) {
+    @ExceptionHandler(CustomerException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(CustomerException e) {
         Response response = new Response(e.getMessage(), null, 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }

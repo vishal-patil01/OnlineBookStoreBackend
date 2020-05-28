@@ -1,6 +1,7 @@
 package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.dto.CustomerDTO;
+import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.User;
@@ -45,4 +46,10 @@ public class CustomerService implements ICustomerService {
         customerRepository.save(customer);
         return "Customer Details Updated Successfully";
     }
+
+    @Override
+    public Customer fetchCustomerDetails(AddressType addressType, String token) {
+        return null;
+    }
+
 }
