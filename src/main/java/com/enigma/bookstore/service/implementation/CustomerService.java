@@ -2,6 +2,7 @@ package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.dto.CustomerDTO;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.User;
@@ -47,9 +48,13 @@ public class CustomerService implements ICustomerService {
         return "Customer Details Updated Successfully";
     }
 
+
     @Override
     public Customer fetchCustomerDetails(AddressType addressType, String token) {
-        return null;
+        int userId = jwtToken.verifyToken(token);
+        List<Customer> customerList = customerRepository.findByUserIdAndAndCustomerAddressType(userId, addressType);
+        if (customerList.isEmpty())
+            throw new CustomerException("There is No CustomerData Available");
+        return customerList.get(0);
     }
-
 }

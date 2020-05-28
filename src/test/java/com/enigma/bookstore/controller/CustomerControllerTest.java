@@ -3,6 +3,7 @@ package com.enigma.bookstore.controller;
 import com.enigma.bookstore.dto.CustomerDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.User;
@@ -76,15 +77,25 @@ public class CustomerControllerTest {
 
     @Test
     void givenRequest_WhenCustomer_ShouldReturnCustomerDetails() throws Exception {
-        CustomerDTO customerDTO = new CustomerDTO( 425001, "India", "Shiv Colony", "India", "Near Hotel", AddressType.HOME);
+        CustomerDTO customerDTO = new CustomerDTO(425001, "India", "Shiv Colony", "India", "Near Hotel", AddressType.HOME);
         Customer customerDetails = new Customer(customerDTO, user);
         String jsonData = gson.toJson(customerDetails);
         when(customerService.fetchCustomerDetails(any(), any())).thenReturn(customerDetails);
-        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/customer/"+AddressType.HOME).contentType(MediaType.APPLICATION_JSON)
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/customer/" + AddressType.HOME).contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Response responseDto = gson.fromJson(response, Response.class);
-        Assert.assertEquals("Customer Details Fetched Successfully",responseDto.message);
+        Assert.assertEquals("Customer Details Fetched Successfully", responseDto.message);
+    }
+
+    @Test
+    void givenRequestForFetchCustomerDetails_WhenCustomerDetailsNotFound_ShouldThrowException() throws Exception {
+        try {
+            when(customerService.fetchCustomerDetails(any(), any())).thenThrow(new CustomerException("There is No CustomerData Available"));
+            this.mockMvc.perform(post("/bookstore/customer")).andReturn();
+        } catch (CustomerException e) {
+            Assert.assertSame("There is No CustomerData Available", e.getMessage());
+        }
     }
 }
 

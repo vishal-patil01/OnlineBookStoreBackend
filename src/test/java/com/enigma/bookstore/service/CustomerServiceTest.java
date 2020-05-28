@@ -2,6 +2,7 @@ package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.dto.CustomerDTO;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
@@ -84,6 +85,26 @@ public class CustomerServiceTest {
             customerService.addCustomerDetails(customerDTO, "authorization");
         } catch (JWTException e) {
             Assert.assertEquals("Token Expired", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenRequest_WhenCustomerDetailsAreAvailable_ShouldReturnCustomerDetails() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+        when(customerRepository.findByUserIdAndAndCustomerAddressType(any(), any())).thenReturn(customersList);
+        Customer existingBook = customerService.fetchCustomerDetails(AddressType.HOME, "authorization");
+        Assert.assertEquals(customersList.get(0), existingBook);
+    }
+
+    @Test
+    void givenCustomerAddressType_WheCustomerDetailsNotPresent_ShouldThrowUserException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(customerRepository.findByUserIdAndAndCustomerAddressType(any(),any())).thenThrow(new CustomerException("There is No CustomerData Available"));
+            customerService.fetchCustomerDetails(AddressType.HOME, "authorization");
+        } catch (CustomerException e) {
+            Assert.assertEquals("There is No CustomerData Available", e.getMessage());
         }
     }
 }
