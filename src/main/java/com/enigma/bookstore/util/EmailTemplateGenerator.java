@@ -1,9 +1,12 @@
 package com.enigma.bookstore.util;
 
+import com.enigma.bookstore.model.CartItems;
+import com.enigma.bookstore.model.OrderProducts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 @Component
@@ -247,6 +250,63 @@ public class EmailTemplateGenerator {
                 "        <h4>Hello <b> " + userName + " </b></h4>\n";
     }
 
+    public String getOrderPlacedTemplate(List<CartItems> cartItemsList, Double totalPrice, String formattedDate, String address, Integer orderId) {
+        return "        <p>We have received your order and are working on it now. You'll receive an email when your items are\n" +
+                "            shipped.</p>\n" +
+                "        <p>If you have any questions,Mail us at bookstore.engima@gmail.com</p>\n" +
+                "\n" +
+                "\n" +
+                "        <div class='navbar' style='background-color:#00AAE4;margin-bottom:2%'>\n" +
+                "            <p>Items Ordered</p>\n" +
+                "        </div>\n" +
+                "\n" +
+                "\n" +
+                "        <table align='center' class='itemstb'>\n" +
+                "            <tr>\n" +
+                "                <th>Book Image</th>" +
+                "                <th>Book Name</th>\n" +
+                "                <th>Quantity</th>\n" +
+                "                <th>Price</th>\n" +
+                "            </tr>\n" +
+                generateTable(cartItemsList)
+                +
+                "        </table>\n" +
+                "\n" +
+                "<hr/>" +
+                "        <div class='containersubtb'>\n" +
+                "            <table class='subtable'>\n" +
+                "                <tr>\n" +
+                "                    <td><b>  Total:</b></td>\n" +
+                "                    <td><b>Rs."+totalPrice+"</b></td>\n" +
+                "                </tr>\n" +
+                "            </table>\n" +
+                "        </div>\n" +
+                "        <div class='row' style='margin-top:6%;margin-bottom:6%'>\n" +
+                "            <div class='column' style='background-color:#ececec;color:black'>\n" +
+                "                <h3>SUMMARY:</h3>\n" +
+                "                <table class='ordertb'>\n" +
+                "                    <tr>\n" +
+                "                        <td>Order Id:</td>\n" +
+                "                        <td>#"+orderId+"</td>\n" +
+                "                    </tr>\n" +
+                "                    <tr>\n" +
+                "                        <td>Order Date:</td>\n" +
+                "                        <td>" + formattedDate + "</td>\n" +
+                "                    </tr>\n" +
+                "                    <tr>\n" +
+                "                        <td>Order Total:</td>\n" +
+                "                        <td>Rs." + totalPrice + "</td>\n" +
+                "                    </tr>\n" +
+                "                </table>\n" +
+                "            </div>\n" +
+                "            <div class='column' style='background-color:#00AAE4;color:white'>\n" +
+                "                <h3>SHIPPING ADDRESS:</h3>\n" +
+                "                <p>" + address + "</p>\n" +
+                "            </div>\n" +
+                "        </div>\n" +
+                "\n";
+    }
+
     public String getFooter() {
         return "        <div class='deli'>\n" +
                 "            <p>We hope to see you again soon.</p>\n" +
@@ -259,6 +319,22 @@ public class EmailTemplateGenerator {
                 "\n" +
                 "</html>\n" +
                 "\n";
+    }
+
+    private String generateTable(List<CartItems> cartItemsList) {
+        StringBuilder table = new StringBuilder();
+        for (CartItems cartItems : cartItemsList) {
+            table.append("<tr><td><img src='cid:").append(cartItems.getBook().getBookImageSrc().substring(cartItems.getBook().getBookImageSrc().lastIndexOf('/') + 1)).append("' style='height: 80px;width: 60px;margin-top:4px;margin-bottom:4px'/></td>")
+                    .append("<td><p class='bookName'>")
+                    .append(cartItems.getBook().getBookName())
+                    .append("</p></td>\n")
+                    .append("<td>")
+                    .append(cartItems.getQuantity())
+                    .append("</td>\n").append("<td>Rs.")
+                    .append(cartItems.getQuantity() * cartItems.getBook().getBookPrice())
+                    .append("</td></tr>\n");
+        }
+        return table.toString();
     }
 
     public String getVerifyEmailTemplate(String generateToken) {

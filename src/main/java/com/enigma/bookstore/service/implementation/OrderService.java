@@ -11,6 +11,9 @@ import com.enigma.bookstore.util.IMailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,12 +57,26 @@ public class OrderService implements IOrderService {
             OrderProducts orderProducts = new OrderProducts(cartBook.getBook(), orders, cartBook.getQuantity());
             orderProductsRepository.save(orderProducts);
         });
+        String customerAddress = customerDetails.customerAddress + " " + customerDetails.customerLandmark + " " + customerDetails.customerTown + ", " + customerDetails.customerPinCode;
         String message = orderEmailTemplate.getHeader(user.getFullName())
-                + "Order Placed Successfully"
+                + orderEmailTemplate.getOrderPlacedTemplate(cartItemsList, totalPrice, getFormattedDate(new Timestamp(System.currentTimeMillis()).toString()), customerAddress, savedOrder.getOrderId())
                 + orderEmailTemplate.getFooter();
         cartItemsRepository.deleteCartItems(cart.getCardId());
         mailService.sendEmail(user.getEmail(), subject, message);
         return savedOrder.getOrderId();
+    }
+
+    private String getFormattedDate(String timeStamp) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss.SSS");
+        String orderDate = "";
+        try {
+            Date date = sdf.parse(timeStamp);
+            sdf.applyPattern("dd MMMM yyyy");
+            orderDate = sdf.format(date);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return orderDate;
     }
 
     private Cart checkUserAndCartIsExists(String token) {

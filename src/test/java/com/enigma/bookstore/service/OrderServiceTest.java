@@ -113,6 +113,7 @@ public class OrderServiceTest {
         when(orderRepository.save(any())).thenReturn(orders);
         when(bookCartRepository.deleteCartItems(anyInt())).thenReturn(1);
         when(emailTemplateGenerator.getHeader(any())).thenReturn("Header");
+        when(emailTemplateGenerator.getOrderPlacedTemplate(any(), any(), any(), any(), any())).thenReturn("Header");
         when(emailTemplateGenerator.getFooter()).thenReturn("Footer");
         when(mailService.sendEmail(any(), any(), any())).thenReturn("Email Has Been Sent");
         Integer message = orderBookService.placeOrder(1420.0, "authorization");
