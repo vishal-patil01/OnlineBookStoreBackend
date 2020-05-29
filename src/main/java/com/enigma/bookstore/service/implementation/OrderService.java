@@ -62,7 +62,7 @@ public class OrderService implements IOrderService {
                 + orderEmailTemplate.getOrderPlacedTemplate(cartItemsList, totalPrice, getFormattedDate(new Timestamp(System.currentTimeMillis()).toString()), customerAddress, savedOrder.getOrderId())
                 + orderEmailTemplate.getFooter();
         cartItemsRepository.deleteCartItems(cart.getCardId());
-        mailService.sendEmail(user.getEmail(), subject, message);
+        mailService.sendEmail(user.getEmail(), subject, message, cartItemsList);
         return savedOrder.getOrderId();
     }
 
