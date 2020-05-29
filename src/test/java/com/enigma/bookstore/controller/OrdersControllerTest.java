@@ -1,6 +1,7 @@
 package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.service.IOrderService;
 import com.google.gson.Gson;
 import org.junit.Assert;
@@ -34,6 +35,16 @@ public class OrdersControllerTest {
         Response responseDto = gson.fromJson(response, Response.class);
         Double responseMessage = (Double) responseDto.data;
         Assert.assertEquals(36892.0, responseMessage, 0.0);
+    }
+
+    @Test
+    void givenOrderData_WhenUserNotFound_ShouldThrowUserException() throws Exception {
+        when(orderService.placeOrder(any(), any())).thenThrow(new UserException("User Not Found"));
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/order/1500")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals("User Not Found", responseMessage);
     }
 }
 
