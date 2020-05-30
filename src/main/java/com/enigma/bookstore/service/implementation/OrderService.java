@@ -66,6 +66,11 @@ public class OrderService implements IOrderService {
         return savedOrder.getOrderId();
     }
 
+    @Override
+    public List<Orders> fetchOrders(String token) {
+        return null;
+    }
+
     private String getFormattedDate(String timeStamp) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss.SSS");
         String orderDate = "";
