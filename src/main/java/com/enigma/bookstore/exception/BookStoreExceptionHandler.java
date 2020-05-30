@@ -43,4 +43,10 @@ public class BookStoreExceptionHandler {
         Response response = new Response(e.getMessage(), null, 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
+
+    @ExceptionHandler(OrderException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(OrderException e) {
+        Response response = new Response(e.getMessage(), null, 208);
+        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
+    }
 }

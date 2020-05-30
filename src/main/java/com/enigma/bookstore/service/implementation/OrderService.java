@@ -1,6 +1,7 @@
 package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.exception.CartException;
+import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.*;
 import com.enigma.bookstore.repository.*;
@@ -68,7 +69,11 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<Orders> fetchOrders(String token) {
-        return null;
+        User user = userRepository.findById(jwtToken.verifyToken(token)).orElseThrow(() -> new UserException("User Not Found"));
+        List<Orders> ordersPlacedByUser = orderRepository.findOrdersByUser_IdOrderByOrderPlacedDateDesc(user.getId());
+        if (ordersPlacedByUser.isEmpty())
+            throw new OrderException("There Is No Order Placed Yet");
+        return ordersPlacedByUser;
     }
 
     private String getFormattedDate(String timeStamp) {

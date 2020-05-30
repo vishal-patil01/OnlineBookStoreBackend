@@ -5,6 +5,7 @@ import com.enigma.bookstore.dto.CartDTO;
 import com.enigma.bookstore.dto.CustomerDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.model.*;
 import com.enigma.bookstore.repository.*;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
@@ -29,9 +30,6 @@ public class OrderServiceTest {
 
     @Autowired
     IOrderService orderBookService;
-//
-//    @MockBean
-//    JavaMailSender javaMailSender;
 
     @MockBean
     IBookRepository onlineBookStoreRepository;
@@ -118,5 +116,31 @@ public class OrderServiceTest {
         when(mailService.sendEmail(any(), any(), any(), any())).thenReturn("Email Has Been Sent");
         Integer message = orderBookService.placeOrder(1420.0, "authorization");
         Assert.assertEquals(123456, message, 0.0);
+    }
+
+    @Test
+    void givenCustomerOrderDetailsToAddInDatabase_WhenAdded_ShouldReturnCorrectDetails1() {
+        Orders orderBookDetails = new Orders(userDetails, 1000.0, customerDetails, 123456);
+        List<Orders> orderBookDetailsList = new ArrayList<>();
+        orderBookDetailsList.add(orderBookDetails);
+        when(tokenGenerator.verifyToken(any())).thenReturn(1);
+        when(cartRepository.findByUserId(any())).thenReturn(java.util.Optional.of(new Cart()));
+        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(userDetails));
+        when(orderRepository.findOrdersByUser_IdOrderByOrderPlacedDateDesc(any())).thenReturn(orderBookDetailsList);
+        List<Orders> orderBookDetailsList1 = orderBookService.fetchOrders("authorization");
+        Assert.assertEquals(orderBookDetailsList, orderBookDetailsList1);
+    }
+
+    @Test
+    void givenCustomerOrderDetailsToAddInDatabase_WhenAdded_ShouldReturnCorrectDetails2() {
+        try {
+            when(tokenGenerator.verifyToken(any())).thenReturn(1);
+            when(cartRepository.findByUserId(any())).thenReturn(java.util.Optional.of(new Cart()));
+            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(userDetails));
+            when(orderRepository.findOrdersByUser_IdOrderByOrderPlacedDateDesc(any())).thenThrow(new OrderException("There Is No Order Placed Yet"));
+            orderBookService.fetchOrders("authorization");
+        } catch (OrderException e) {
+            Assert.assertEquals("There Is No Order Placed Yet", e.getMessage());
+        }
     }
 }
