@@ -8,6 +8,7 @@ import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.ICartService;
 import com.enigma.bookstore.service.IUserService;
+import com.enigma.bookstore.service.IWishListService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
 import com.enigma.bookstore.util.implementation.JWTToken;
@@ -39,6 +40,9 @@ public class UserService implements IUserService {
 
     @Autowired
     ICartService cartService;
+
+    @Autowired
+    IWishListService wishListService;
 
     @Override
     public String userRegistration(UserRegistrationDTO userRegistrationDTO, HttpServletRequest httpServletRequest) {
@@ -88,6 +92,7 @@ public class UserService implements IUserService {
         user.setEmailVerified(true);
         userRepository.save(user);
         cartService.createCart(user);
+        wishListService.createWishList(user);
         return "Email Address Verified";
     }
 
