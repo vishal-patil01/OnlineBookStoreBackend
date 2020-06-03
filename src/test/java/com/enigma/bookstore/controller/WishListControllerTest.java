@@ -38,6 +38,7 @@ public class WishListControllerTest {
     List<WishListItems> wishList = new ArrayList<>();
     BookDTO bookDTO;
 
+
     @Test
     void givenCartData_WhenAllValidationAreTrue_ShouldReturnBookAddedToWishListMessage() throws Exception {
         WishListItems wishListItems = new WishListItems(book, new WishList());

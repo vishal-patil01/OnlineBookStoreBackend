@@ -56,7 +56,11 @@ public class WishListService implements IWishListService {
 
     @Override
     public List<WishListItems> fetchWishList(String token) {
-      return null;
+        WishList wishList = checkUserAndWishListIsExists(token);
+        List<WishListItems> wishListItemsList = wishListItemsRepository.findAllByWishListWishId(wishList.getWishId());
+        if (wishListItemsList.isEmpty())
+            throw new WishListItemsException("There Is No Books In WishList");
+        return wishListItemsList;
     }
 
     private WishList checkUserAndWishListIsExists(String token) {
@@ -67,5 +71,3 @@ public class WishListService implements IWishListService {
                 .orElseThrow(() -> new WishListException("WishList Id Not Found"));
     }
 }
-
-

@@ -1,7 +1,7 @@
+
 package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.dto.BookDTO;
-import com.enigma.bookstore.exception.WishListException;
 import com.enigma.bookstore.exception.WishListItemsException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.User;
@@ -76,17 +76,39 @@ public class WishListServiceTest {
 
     @Test
     void givenBookToAddInWishList_WhenBookIsAlreadyExistsInWishList_ShouldThrowWishListException() {
-
         try {
             when(jwtToken.verifyToken(any())).thenReturn(1);
             when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(bookStoreRepository.findById(any())).thenReturn(Optional.of(new Book()));
             when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(new WishList()));
             when(WishListRepository.save(any())).thenReturn(wishListItems);
-            when(WishListItemsRepository.findByBookIdAndWishListWishId(any(),any())).thenReturn(wishListItems1);
+            when(WishListItemsRepository.findByBookIdAndWishListWishId(any(), any())).thenReturn(wishListItems1);
             WishListService.addToWishList(1, "authorization");
         } catch (WishListItemsException e) {
             Assert.assertEquals("Book Already Exists In WishList", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenRequest_WhenGetResponse_ShouldReturnWishListData() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+        when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
+        when(WishListItemsRepository.findAllByWishListWishId(1)).thenReturn(wishListItems1);
+        List<WishListItems> itemsList = WishListService.fetchWishList("token");
+        Assert.assertEquals(wishListItems1, itemsList);
+    }
+
+    @Test
+    void givenRequest_WhenThereIsNoBookInWishList_ShouldThrowWishListItemException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+            when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
+            when(WishListItemsRepository.findAllByWishListWishId(1)).thenReturn(new ArrayList<>());
+            WishListService.fetchWishList("token");
+        } catch (WishListItemsException e) {
+            Assert.assertEquals("There Is No Books In WishList", e.getMessage());
         }
     }
 }
