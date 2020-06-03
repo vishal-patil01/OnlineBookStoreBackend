@@ -54,6 +54,11 @@ public class WishListService implements IWishListService {
         throw new WishListItemsException("Book Already Exists In WishList");
     }
 
+    @Override
+    public List<WishListItems> fetchWishList(String token) {
+      return null;
+    }
+
     private WishList checkUserAndWishListIsExists(String token) {
         int userId = jwtToken.verifyToken(token);
         userRepository.findById(userId)

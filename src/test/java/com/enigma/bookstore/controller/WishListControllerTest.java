@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(WishListController.class)
@@ -50,5 +51,19 @@ public class WishListControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
     }
+
+    @Test
+    void givenRequest_WhenWishListIsNotEmpty_ShouldReturnWishListRecords() throws Exception {
+        bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        WishListItems wishListItems = new WishListItems(book, new WishList());
+        String message = "Wings Of Fire";
+        wishList.add(wishListItems);
+        when(wishListService.fetchWishList(any())).thenReturn(wishList);
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/wishlist")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Assert.assertTrue(response.contains(message));
+    }
+
 }
 
