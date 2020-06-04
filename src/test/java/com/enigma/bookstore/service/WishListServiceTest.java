@@ -111,4 +111,27 @@ public class WishListServiceTest {
             Assert.assertEquals("There Is No Books In WishList", e.getMessage());
         }
     }
+
+    @Test
+    void givenBookId_WhenBookExistsInWishList_ShouldReturnBookRemovedFromWishListSuccessfullyMessage() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+        when(WishListItemsRepository.findById(1)).thenReturn(Optional.ofNullable(wishListItems));
+        when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
+        String existingBook = WishListService.deleteBookFromWishList(1, "token");
+        Assert.assertEquals("Book Removed From WishList", existingBook);
+    }
+
+    @Test
+    void givenBookId_WhenThereIsNoBookInWishList_ShouldThrowWishListItemException() {
+        try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+            when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
+            when(WishListItemsRepository.findAllByWishListWishId(1)).thenReturn(new ArrayList<>());
+            WishListService.deleteBookFromWishList(1, "token");
+        } catch (WishListItemsException e) {
+            Assert.assertEquals("There Is No Books In WishList", e.getMessage());
+        }
+    }
 }
