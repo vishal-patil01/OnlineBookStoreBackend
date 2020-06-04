@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(WishListController.class)
 public class WishListControllerTest {
@@ -64,6 +64,17 @@ public class WishListControllerTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/wishlist")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Assert.assertTrue(response.contains(message));
+    }
+
+    @Test
+    void givenBookId_WhenBookIsPresent_ShouldReturnBookRemovedFromWishListSuccessfullyMessage() throws Exception {
+        String message = "Book Removed From WishList successfully";
+        when(wishListService.deleteBookFromWishList(anyInt(), any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(delete("/bookstore/wishlist/1")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
     }
 
 }

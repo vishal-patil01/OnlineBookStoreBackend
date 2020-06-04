@@ -31,4 +31,11 @@ public class WishListController {
         Response response = new Response("WishList Data Fetched Successfully", wishListItems, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("/wishlist/{bookid}")
+    public ResponseEntity<Response> deleteBookFromWishList(@PathVariable(name = "bookid") Integer bookId, @RequestHeader(value = "token", required = false) String token) {
+        String message = wishListService.deleteBookFromWishList(bookId, token);
+        Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -11,4 +11,6 @@ public interface IWishListService {
     String addToWishList(Integer bookId, String token);
 
     List<WishListItems> fetchWishList(String token);
+
+    String deleteBookFromWishList(Integer wishListId, String token);
 }

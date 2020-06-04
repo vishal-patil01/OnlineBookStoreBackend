@@ -63,6 +63,13 @@ public class WishListService implements IWishListService {
         return wishListItemsList;
     }
 
+    @Override
+    public String deleteBookFromWishList(Integer bookId, String token) {
+        WishList wishList = checkUserAndWishListIsExists(token);
+        wishListItemsRepository.deleteWishItems(bookId, wishList.getWishId());
+        return "Book Removed From WishList";
+    }
+
     private WishList checkUserAndWishListIsExists(String token) {
         int userId = jwtToken.verifyToken(token);
         userRepository.findById(userId)
