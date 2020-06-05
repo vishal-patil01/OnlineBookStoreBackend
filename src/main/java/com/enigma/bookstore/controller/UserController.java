@@ -6,6 +6,7 @@ import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.exception.UserException;
+import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,14 +33,14 @@ public class UserController {
     public ResponseEntity<Response> register(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new UserException("Invalid Data !!! Please Enter Correct Data");
-        String message = userService.userRegistration(userRegistrationDTO,httpServletRequest);
+        String message = userService.userRegistration(userRegistrationDTO, httpServletRequest);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/resend/email/{email}")
     public ResponseEntity<Response> sendEmailWithTokenLink(@PathVariable(name = "email") String email) {
-        String message = userService.sendEmailWithTokenLink(email,httpServletRequest);
+        String message = userService.sendEmailWithTokenLink(email, httpServletRequest);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -57,7 +58,7 @@ public class UserController {
             return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
         String token = userService.userLogin(userLoginDTO);
         httpServletResponse.setHeader("authorization", token);
-        Response response = new Response("Login Successful", null, 200);
+        Response response = new Response("Login Successful", userService.getUserFullName(userLoginDTO.email), 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -67,6 +68,13 @@ public class UserController {
             throw new BookException("Invalid Data !!! Please Enter Valid Password");
         String message = userService.resetPassword(resetPasswordDTO, token);
         Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<Response> fetchUserDetails(@RequestHeader(value = "token", required = false) String token) {
+        User user = userService.fetchUserDetails(token);
+        Response response = new Response("Cart Data Fetched Successfully", user, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

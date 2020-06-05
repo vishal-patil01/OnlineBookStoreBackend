@@ -49,4 +49,10 @@ public class BookStoreExceptionHandler {
         Response response = new Response(e.getMessage(), null, 208);
         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
     }
+
+    @ExceptionHandler(WishListItemsException.class)
+    public ResponseEntity<Response> onlineBookStoreExceptionHandler(WishListItemsException e) {
+        Response response = new Response(e.getMessage(), null, 208);
+        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
+    }
 }

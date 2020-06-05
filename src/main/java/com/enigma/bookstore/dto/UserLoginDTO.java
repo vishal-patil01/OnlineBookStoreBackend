@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 public class UserLoginDTO {
 
     @NotNull
-    @Pattern(regexp = "^([a-zA-Z]{3,}([.|_|+|-]?[a-zA-Z0-9]+)?[@][a-zA-Z0-9]+[.][a-zA-Z]{2,3}([.]?[a-zA-Z]{2,3})?)$",message = "Invalid Email Address")
+    @Pattern(regexp = "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$",message = "Invalid Email Address")
     @Column(unique = true,nullable = false)
     public String email;
 

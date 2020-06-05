@@ -54,7 +54,8 @@ public class UserService implements IUserService {
         user.setPassword(password);
         userRepository.save(user);
         String token = jwtToken.generateToken(user.getId(), getExpirationTime(Calendar.MINUTE, 10));
-        mailService.sendEmail(user.getEmail(), getEmailSubject(httpServletRequest), getURL(token, httpServletRequest));
+        String message = emailTemplateGenerator.getHeader(user.getFullName()) + getURL(token, httpServletRequest) + emailTemplateGenerator.getFooter();
+        mailService.sendEmail(user.getEmail(), getEmailSubject(httpServletRequest), message);
         return "Registration Successful";
     }
 
@@ -104,6 +105,18 @@ public class UserService implements IUserService {
         user.setPassword(password);
         userRepository.save(user);
         return "Password Reset Successfully";
+    }
+
+    @Override
+    public String getUserFullName(String email) {
+        return userRepository.findByEmail(email).get().getFullName();
+    }
+
+    @Override
+    public User fetchUserDetails(String token) {
+        int userId = this.jwtToken.verifyToken(token);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("UseId Not Exist"));
     }
 
     private Date getExpirationTime(Integer timePeriod, Integer value) {
