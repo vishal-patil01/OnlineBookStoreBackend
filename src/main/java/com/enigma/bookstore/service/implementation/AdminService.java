@@ -76,4 +76,9 @@ public class AdminService implements IAdminService {
                 .path(fileName)
                 .toUriString();
     }
+
+    @Override
+    public String updateBook(BookDTO bookDTO, Integer bookId) {
+     return null;
+    }
 }

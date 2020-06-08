@@ -94,4 +94,19 @@ class AdminControllerTest {
                 .andReturn();
         Assert.assertEquals(200, result.getResponse().getStatus());
     }
+
+    // --
+    @Test
+    void givenBookDtoAndBookId_WhenGetResponse_ItShouldReturnBookUpdatedSuccessfully() throws Exception {
+        bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        String toJson = gson.toJson(book);
+        when(adminService.updateBook(any(), any())).thenReturn("Book Updated Successfully");
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/admin/book/1").content(toJson)
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals("Book Updated Successfully", responseMessage);
+    }
 }

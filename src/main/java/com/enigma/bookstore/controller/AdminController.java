@@ -32,6 +32,11 @@ public class AdminController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/book/{bookid}")
+    public ResponseEntity<Response> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable(name = "bookid") Integer bookId, BindingResult bindingResult) {
+        return getResponseResponseEntity(bindingResult, adminService.updateBook(bookDTO, bookId));
+    }
+
     private ResponseEntity<Response> getResponseResponseEntity(BindingResult bindingResult, String serviceResponse) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);

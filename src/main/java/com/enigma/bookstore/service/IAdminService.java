@@ -7,4 +7,6 @@ public interface IAdminService {
     String addBook(BookDTO bookDTO);
 
     String uploadImage(MultipartFile file);
+
+    String updateBook(BookDTO bookDTO, Integer bookId);
 }
