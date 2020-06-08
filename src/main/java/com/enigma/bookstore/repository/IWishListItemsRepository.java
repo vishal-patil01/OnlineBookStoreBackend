@@ -1,5 +1,6 @@
 package com.enigma.bookstore.repository;
 
+import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.model.WishListItems;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,6 +14,7 @@ import java.util.List;
 @Repository
 public interface IWishListItemsRepository extends JpaRepository<WishListItems, Integer> {
     List<WishListItems> findAllByWishListWishId(Integer wishListId);
+    List<WishListItems> findAllByBookId(Integer bookId);
 
     @Transactional
     @Modifying

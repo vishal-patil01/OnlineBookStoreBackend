@@ -3,9 +3,15 @@ package com.enigma.bookstore.service.implementation;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
+import com.enigma.bookstore.model.CartItems;
+import com.enigma.bookstore.model.User;
+import com.enigma.bookstore.model.WishListItems;
 import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IBookRepository;
+import com.enigma.bookstore.repository.ICartItemsRepository;
+import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.service.IAdminService;
+import com.enigma.bookstore.util.IMailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,12 +23,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService implements IAdminService {
 
     @Autowired
     private IBookRepository bookRepository;
+
+    @Autowired
+    private IWishListItemsRepository wishListItemsRepository;
+
+    @Autowired
+    private ICartItemsRepository cartItemsRepository;
+
+    @Autowired
+    IMailService mailService;
 
     @Autowired
     private ApplicationProperties applicationProperties;

@@ -21,19 +21,23 @@ public class AdminController {
     IAdminService adminService;
 
     @PostMapping("/book")
-    public ResponseEntity<Response> addBooks(@Valid @RequestBody BookDTO bookDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
-        }
-        String message = adminService.addBook(bookDTO);
-        Response response = new Response(message, null, 200);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<Response> addBook(@Valid @RequestBody BookDTO bookDTO, BindingResult bindingResult) {
+        return getResponseResponseEntity(bindingResult, adminService.addBook(bookDTO));
     }
 
     @PostMapping("/image")
     public ResponseEntity<Response> uploadImage(@RequestParam("file") MultipartFile file) {
         String fileDownloadURL = adminService.uploadImage(file);
         Response response = new Response("Image Loaded Successfully", fileDownloadURL, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private ResponseEntity<Response> getResponseResponseEntity(BindingResult bindingResult, String serviceResponse) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        }
+        String message = serviceResponse;
+        Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

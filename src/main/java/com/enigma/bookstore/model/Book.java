@@ -1,7 +1,6 @@
 package com.enigma.bookstore.model;
 
 import com.enigma.bookstore.dto.BookDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,6 @@ import org.hibernate.validator.constraints.Range;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.util.List;
 
 @Entity
 @Getter
@@ -28,8 +26,8 @@ public class Book {
 
     @Id
     @GeneratedValue(
-            strategy= GenerationType.AUTO,
-            generator="native"
+            strategy = GenerationType.AUTO,
+            generator = "native"
     )
     @GenericGenerator(
             name = "native",
@@ -60,6 +58,17 @@ public class Book {
     private int publishingYear;
 
     public Book(BookDTO bookDTO) {
+        this.isbnNumber = bookDTO.isbnNumber;
+        this.bookName = bookDTO.bookName;
+        this.authorName = bookDTO.authorName;
+        this.bookPrice = bookDTO.bookPrice;
+        this.noOfCopies = bookDTO.noOfCopies;
+        this.bookDetail = bookDTO.bookDetail;
+        this.bookImageSrc = bookDTO.bookImageSrc;
+        this.publishingYear = bookDTO.publishingYear;
+    }
+
+    public void updateBook(BookDTO bookDTO) {
         this.isbnNumber = bookDTO.isbnNumber;
         this.bookName = bookDTO.bookName;
         this.authorName = bookDTO.authorName;

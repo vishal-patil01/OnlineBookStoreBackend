@@ -5,6 +5,7 @@ import com.enigma.bookstore.dto.CartDTO;
 import com.enigma.bookstore.dto.CustomerDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.model.*;
 import com.enigma.bookstore.repository.*;
@@ -88,7 +89,7 @@ public class OrderServiceTest {
         bookCartList = new ArrayList<>();
         bookCartList.add(bookCart);
         cart.setCartItems(bookCartList);
-        userRegistrationDTO = new UserRegistrationDTO("Sam", "Sam@gmail.com", "Sam@12345", "9874521478", false);
+        userRegistrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         userDetails = new User(userRegistrationDTO);
         cart.setUser(userDetails);
         customerDTO = new CustomerDTO(425001, "Mumbai", "Shiv Colony", "Mumbai", "Thane", AddressType.HOME);

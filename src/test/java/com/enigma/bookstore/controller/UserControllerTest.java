@@ -4,6 +4,7 @@ import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
@@ -37,7 +38,7 @@ public class UserControllerTest {
 
     @Test
     void givenUserRegistrationData_WhenAllValidationAreTrue_ShouldReturnRegistrationSuccessfulMessage() throws Exception {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         User userDetails = new User(registrationDTO);
         String stringConvertDTO = gson.toJson(userDetails);
         String message = "REGISTRATION SUCCESSFUL";
@@ -52,7 +53,7 @@ public class UserControllerTest {
 
     @Test
     void givenUserRegistrationData_WhenUserIsAlreadyRegistered_ShouldThrowException() throws Exception {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         User userDetails = new User(registrationDTO);
         String stringConvertDTO = gson.toJson(userDetails);
         when(userService.userRegistration(any(), any())).thenThrow(new UserException("User With This Email Address Already Exists"));

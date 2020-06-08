@@ -5,5 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IAdminService {
     String addBook(BookDTO bookDTO);
+
     String uploadImage(MultipartFile file);
 }

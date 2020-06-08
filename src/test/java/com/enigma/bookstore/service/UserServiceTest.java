@@ -3,6 +3,7 @@ package com.enigma.bookstore.service;
 import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
@@ -49,7 +50,7 @@ public class UserServiceTest {
 
     @Test
     void givenUserRegistrationData_WhenEmailIdAllReadyExist_ShouldReturnEmailIdAlreadyPresentMessage() {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         when(iUserRepository.findByEmail(any())).thenThrow(new UserException("User With This Email Address Already Exists"));
         try {
             userService.userRegistration(registrationDTO, any());
@@ -60,7 +61,7 @@ public class UserServiceTest {
 
     @Test
     void givenUserRegistrationData_WhenAllValidationAreTrue_ShouldReturnRegistrationSuccessfulMessage() {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         when(iUserRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(iUserRepository.save(any())).thenReturn(new User());
         when(httpServletRequest.getHeader(any())).thenReturn("verify");
@@ -90,7 +91,7 @@ public class UserServiceTest {
     @Test
     void givenUserLoginDTO_WhenAllValidationAreTrue_ShouldReturnLoginSuccessfulMessage() {
         UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         User user = new User(registrationDTO);
         user.setEmailVerified(true);
         when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
@@ -115,7 +116,7 @@ public class UserServiceTest {
     void givenUserLoginDTO_WhenEmailAddressIsExistsButPasswordNotMatches_ShouldThrowUserException() {
         try {
             UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
-            UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+            UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
             User user = new User(registrationDTO);
             user.setEmailVerified(true);
             when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
@@ -140,7 +141,7 @@ public class UserServiceTest {
     @Test
     void givenResetPasswordDTO_WhenTokenIsValid_ShouldReturnPasswordChangedSuccessfullyMessage() {
         ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO("Sam@123");
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
         User user = new User(registrationDTO);
         user.setEmailVerified(true);
         when(iUserRepository.findById(any())).thenReturn(Optional.of(user));

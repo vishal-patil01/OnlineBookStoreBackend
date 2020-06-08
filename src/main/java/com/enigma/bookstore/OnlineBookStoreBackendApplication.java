@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties(ApplicationProperties.class)
 public class OnlineBookStoreBackendApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(OnlineBookStoreBackendApplication.class, args);
     }
