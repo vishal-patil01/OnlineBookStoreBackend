@@ -79,6 +79,9 @@ public class AdminService implements IAdminService {
 
     @Override
     public String updateBook(BookDTO bookDTO, Integer bookId) {
-     return null;
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Update Operation"));
+        book.updateBook(bookDTO);
+        bookRepository.save(book);
+        return "Book Updated successfully.";
     }
 }

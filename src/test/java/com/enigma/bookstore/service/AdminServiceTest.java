@@ -88,4 +88,22 @@ public class AdminServiceTest {
             Assert.assertEquals("Book Name and Author Name is already exists.", e.getMessage());
         }
     }
+    @Test
+    void givenBookDetails_WhenAllValidationAreTrue_ShouldReturnBookUpdatedSuccessfullyMessage() {
+        when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
+        when(wishListItemsRepository.findAllByBookId(any())).thenReturn(wishListItems1);
+        String existingBook = adminService.updateBook(bookDTO, 1);
+        Assert.assertEquals("Book Updated successfully.", existingBook);
+    }
+
+    @Test
+    void givenBookDetails_WhenBookNotFound_ShouldThrowBookNotFoundException() {
+        try {
+            when(bookStoreRepository.findById(any())).thenThrow(new BookException("Book Not Found"));
+            when(wishListItemsRepository.findAllByBookId(any())).thenReturn(wishListItems1);
+            adminService.updateBook(bookDTO, 1);
+        } catch (BookException e) {
+            Assert.assertEquals("Book Not Found", e.getMessage());
+        }
+    }
 }
