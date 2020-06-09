@@ -85,6 +85,12 @@ public class AdminService implements IAdminService {
 
     @Override
     public String deleteBook(Integer bookId) {
-        return null;
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Delete Operation"));
+        List<WishListItems> wishListItemsList = wishListItemsRepository.findAllByBookId(bookId);
+        List<CartItems> cartItemsList = cartItemsRepository.findAllByBookId(bookId);
+        if (!cartItemsList.isEmpty() || !wishListItemsList.isEmpty())
+            throw new BookException("Book Can Not Be Deleted. It May Be Added In WishList Or Cart");
+        bookRepository.delete(book);
+        return "Book Deleted Successfully";
     }
 }

@@ -106,4 +106,24 @@ public class AdminServiceTest {
             Assert.assertEquals("Book Not Found", e.getMessage());
         }
     }
+    @Test
+    void givenBookDetails_WhenBookExistsAndNotAddedInCartOrWishList_ShouldReturnBookDeletedSuccessfullyMessage() {
+        when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
+        when(wishListItemsRepository.findAllByBookId(any())).thenReturn(new ArrayList<>());
+        when(cartItemsRepository.findAllByBookId(any())).thenReturn(new ArrayList<>());
+        String existingBook = adminService.deleteBook(1);
+        Assert.assertEquals("Book Deleted Successfully", existingBook);
+    }
+
+    @Test
+    void givenBookDetails_WhenBookExistsAndAddedInCartOrWishList_ShouldReturnBookException() {
+        try {
+            when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
+            when(wishListItemsRepository.findAllByBookId(any())).thenReturn(wishListItems1);
+            when(cartItemsRepository.findAllByBookId(any())).thenReturn(new ArrayList<>());
+            adminService.deleteBook(1);
+        } catch (BookException e) {
+            Assert.assertEquals("Book Can Not Be Deleted. It May Be Added In WishList Or Cart", e.getMessage());
+        }
+    }
 }
