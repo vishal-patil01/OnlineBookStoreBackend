@@ -36,6 +36,13 @@ public class AdminController {
     public ResponseEntity<Response> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable(name = "bookid") Integer bookId, BindingResult bindingResult) {
         return getResponseResponseEntity(bindingResult, adminService.updateBook(bookDTO, bookId));
     }
+    @DeleteMapping("/book/{bookid}")
+    public ResponseEntity<Response> deleteBook(@PathVariable(name = "bookid") Integer bookId) {
+        String message = adminService.deleteBook(bookId);
+        Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     private ResponseEntity<Response> getResponseResponseEntity(BindingResult bindingResult, String serviceResponse) {
         if (bindingResult.hasErrors()) {

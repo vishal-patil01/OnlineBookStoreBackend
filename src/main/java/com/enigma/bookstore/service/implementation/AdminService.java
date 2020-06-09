@@ -4,7 +4,6 @@ import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.CartItems;
-import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.model.WishListItems;
 import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IBookRepository;
@@ -24,7 +23,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AdminService implements IAdminService {
@@ -83,5 +81,10 @@ public class AdminService implements IAdminService {
         book.updateBook(bookDTO);
         bookRepository.save(book);
         return "Book Updated successfully.";
+    }
+
+    @Override
+    public String deleteBook(Integer bookId) {
+        return null;
     }
 }

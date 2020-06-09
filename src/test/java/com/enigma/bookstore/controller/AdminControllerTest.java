@@ -109,4 +109,15 @@ class AdminControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals("Book Updated Successfully", responseMessage);
     }
+
+    @Test
+    void givenBookId_WhenGetResponse_ItShouldReturnBookDeletedSuccessfully() throws Exception {
+        bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        when(adminService.deleteBook(any())).thenReturn("Book Deleted Successfully");
+        MvcResult mvcResult = this.mockMvc.perform(delete("/bookstore/admin/book/1")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals("Book Deleted Successfully", responseMessage);
+    }
 }

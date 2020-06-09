@@ -9,4 +9,6 @@ public interface IAdminService {
     String uploadImage(MultipartFile file);
 
     String updateBook(BookDTO bookDTO, Integer bookId);
+
+    String deleteBook(Integer bookId);
 }
