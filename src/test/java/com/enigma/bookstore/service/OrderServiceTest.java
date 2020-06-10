@@ -114,7 +114,6 @@ public class OrderServiceTest {
         when(emailTemplateGenerator.getHeader(any())).thenReturn("Header");
         when(emailTemplateGenerator.getOrderPlacedTemplate(any(), any(), any(), any(), any())).thenReturn("Header");
         when(emailTemplateGenerator.getFooter()).thenReturn("Footer");
-        when(mailService.sendEmail(any(), any(), any(), any())).thenReturn("Email Has Been Sent");
         Integer message = orderBookService.placeOrder(1420.0, "authorization");
         Assert.assertEquals(123456, message, 0.0);
     }

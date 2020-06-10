@@ -5,9 +5,12 @@ import com.enigma.bookstore.model.CartItems;
 import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
@@ -24,8 +27,9 @@ public class MailService implements IMailService {
     @Autowired
     EmailTemplateGenerator orderEmailTemplate;
 
-    @SafeVarargs
-    public final String sendEmail(String email, String subject, String message, List<CartItems>... attachments) {
+    @Async
+    @Override
+    public void sendEmail(String email, String subject, String message, List<CartItems>... attachments) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -40,7 +44,6 @@ public class MailService implements IMailService {
                 }
             }
             javaMailSender.send(mimeMessage);
-            return "Email Has been Sent Successfully";
         } catch (Exception e) {
             throw new BookException(e.getMessage());
         }

@@ -71,15 +71,6 @@ public class UserServiceTest {
     }
 
     @Test
-    void givenEmail_WhenEmailAddressExistsInDatabase_ShouldReturnVerificationEmailHasBeenSent() {
-        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(new User()));
-        when(mailService.sendEmail(any(), any(), any())).thenReturn("Verification Email Has Been Sent");
-        when(httpServletRequest.getHeader(any())).thenReturn("verify");
-        String existingBook = userService.sendEmailWithTokenLink("Sam@gmail.com", httpServletRequest);
-        Assert.assertEquals("Verification Email Has Been Sent", existingBook);
-    }
-
-    @Test
     void givenEmailForResendVerificationEmail_WhenEmailNotExists_ShouldThrowEmailNotExists() {
         try {
             userService.sendEmailWithTokenLink("sam@gmail.com", httpServletRequest);

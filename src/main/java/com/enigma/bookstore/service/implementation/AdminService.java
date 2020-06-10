@@ -11,7 +11,7 @@ import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICartItemsRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.service.IAdminService;
-import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.service.ISendNotification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -39,7 +39,7 @@ public class AdminService implements IAdminService {
     private ICartItemsRepository cartItemsRepository;
 
     @Autowired
-    IMailService mailService;
+    ISendNotification sendNotification;
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -81,8 +81,7 @@ public class AdminService implements IAdminService {
     public String updateBook(BookDTO bookDTO, Integer bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Update Operation"));
         if (book.getNoOfCopies() <= 0 && bookDTO.noOfCopies >= book.getNoOfCopies()) {
-            List<User> subScribnerList = getSubScribnerList(bookId);
-            subScribnerList.forEach(user -> mailService.sendEmail(user.getEmail(), "Book Is Now Available", "Come To Our WebSite"));
+            sendNotification.notifyUsers(getSubScribnerList(bookId));
         }
         book.updateBook(bookDTO);
         bookRepository.save(book);
