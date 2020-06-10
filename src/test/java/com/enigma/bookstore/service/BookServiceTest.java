@@ -1,10 +1,12 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.enums.FilterAttributes;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.properties.ApplicationProperties;
+import com.enigma.bookstore.rabbitmq.producer.NotificationSender;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.service.implementation.BookService;
 import org.junit.Assert;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import javax.management.Notification;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,11 +40,17 @@ public class BookServiceTest {
     @MockBean
     IBookRepository bookRepository;
 
-    @Autowired
-    BookService bookService;
+    @MockBean
+    ConfigureRabbitMq configureRabbitMq;
 
     @MockBean
     ApplicationProperties applicationProperties;
+
+    @MockBean
+    NotificationSender notificationSender;
+
+    @Autowired
+    BookService bookService;
 
     BookDTO bookDTO;
     List<Book> bookList = new ArrayList<>();

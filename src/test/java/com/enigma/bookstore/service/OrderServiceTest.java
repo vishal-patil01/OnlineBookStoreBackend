@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CartDTO;
 import com.enigma.bookstore.dto.CustomerDTO;
@@ -8,6 +9,7 @@ import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.model.*;
+import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.*;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
@@ -31,6 +33,12 @@ public class OrderServiceTest {
 
     @Autowired
     IOrderService orderBookService;
+
+    @MockBean
+    ConfigureRabbitMq configureRabbitMq;
+
+    @MockBean
+    ApplicationProperties applicationProperties;
 
     @MockBean
     IBookRepository onlineBookStoreRepository;

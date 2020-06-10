@@ -10,4 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
     private String uploadDir;
     private String secretKey;
+    private String rabbitMQExchangeName;
+    private String rabbitMQQueueName;
+    private String rabbitMQRoutingKey;
 }

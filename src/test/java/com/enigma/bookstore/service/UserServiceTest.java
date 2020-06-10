@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
@@ -7,6 +8,7 @@ import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
+import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.UserService;
 import com.enigma.bookstore.util.IMailService;
@@ -33,6 +35,12 @@ public class UserServiceTest {
 
     @Autowired
     UserService userService;
+
+    @MockBean
+    ConfigureRabbitMq configureRabbitMq;
+
+    @MockBean
+    ApplicationProperties applicationProperties;
 
     @MockBean
     JWTToken jwtToken;

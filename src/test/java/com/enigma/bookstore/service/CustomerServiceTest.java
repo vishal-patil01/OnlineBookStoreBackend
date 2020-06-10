@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.CustomerDTO;
 import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.exception.CustomerException;
@@ -7,6 +8,7 @@ import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.User;
+import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.ICustomerRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.CustomerService;
@@ -29,6 +31,12 @@ public class CustomerServiceTest {
 
     @MockBean
     ICustomerRepository customerRepository;
+
+    @MockBean
+    ConfigureRabbitMq configureRabbitMq;
+
+    @MockBean
+    ApplicationProperties applicationProperties;
 
     @MockBean
     IUserRepository userRepository;

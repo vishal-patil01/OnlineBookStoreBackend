@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService implements IOrderService {
@@ -58,12 +59,13 @@ public class OrderService implements IOrderService {
             OrderProducts orderProducts = new OrderProducts(cartBook.getBook(), orders, cartBook.getQuantity());
             orderProductsRepository.save(orderProducts);
         });
+        List<Book> bookList = cartItemsList.stream().map(CartItems::getBook).collect(Collectors.toList());
         String customerAddress = customerDetails.customerAddress + " " + customerDetails.customerLandmark + " " + customerDetails.customerTown + ", " + customerDetails.customerPinCode;
         String message = orderEmailTemplate.getHeader(user.getFullName())
                 + orderEmailTemplate.getOrderPlacedTemplate(cartItemsList, totalPrice, getFormattedDate(new Timestamp(System.currentTimeMillis()).toString()), customerAddress, savedOrder.getOrderId())
                 + orderEmailTemplate.getFooter();
         cartItemsRepository.deleteCartItems(cart.getCardId());
-        mailService.sendEmail(user.getEmail(), subject, message, cartItemsList);
+        mailService.sendEmail(user.getEmail(), subject, message, bookList);
         return savedOrder.getOrderId();
     }
 

@@ -1,5 +1,6 @@
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CartDTO;
 import com.enigma.bookstore.exception.BookException;
@@ -10,6 +11,7 @@ import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.Cart;
 import com.enigma.bookstore.model.CartItems;
 import com.enigma.bookstore.model.User;
+import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICartItemsRepository;
 import com.enigma.bookstore.repository.ICartRepository;
@@ -34,6 +36,12 @@ public class CartServiceTest {
 
     @MockBean
     ICartItemsRepository cartItemsRepository;
+
+    @MockBean
+    ConfigureRabbitMq configureRabbitMq;
+
+    @MockBean
+    ApplicationProperties applicationProperties;
 
     @MockBean
     IBookRepository bookStoreRepository;

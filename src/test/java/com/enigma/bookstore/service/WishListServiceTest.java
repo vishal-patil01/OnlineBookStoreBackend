@@ -1,12 +1,14 @@
 
 package com.enigma.bookstore.service;
 
+import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.exception.WishListItemsException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.model.WishList;
 import com.enigma.bookstore.model.WishListItems;
+import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
@@ -30,6 +32,12 @@ public class WishListServiceTest {
 
     @MockBean
     IWishListItemsRepository WishListItemsRepository;
+
+    @MockBean
+    ConfigureRabbitMq configureRabbitMq;
+
+    @MockBean
+    ApplicationProperties applicationProperties;
 
     @MockBean
     IBookRepository bookStoreRepository;

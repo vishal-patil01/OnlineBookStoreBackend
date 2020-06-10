@@ -1,7 +1,7 @@
 package com.enigma.bookstore.util;
 
+import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.CartItems;
-import com.enigma.bookstore.model.OrderProducts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -268,7 +268,7 @@ public class EmailTemplateGenerator {
                 "                <th>Quantity</th>\n" +
                 "                <th>Price</th>\n" +
                 "            </tr>\n" +
-                generateTable(cartItemsList)
+                generateOrderSummaryTable(cartItemsList)
                 +
                 "        </table>\n" +
                 "\n" +
@@ -277,7 +277,7 @@ public class EmailTemplateGenerator {
                 "            <table class='subtable'>\n" +
                 "                <tr>\n" +
                 "                    <td><b>  Total:</b></td>\n" +
-                "                    <td><b>Rs."+totalPrice+"</b></td>\n" +
+                "                    <td><b>Rs." + totalPrice + "</b></td>\n" +
                 "                </tr>\n" +
                 "            </table>\n" +
                 "        </div>\n" +
@@ -287,7 +287,7 @@ public class EmailTemplateGenerator {
                 "                <table class='ordertb'>\n" +
                 "                    <tr>\n" +
                 "                        <td>Order Id:</td>\n" +
-                "                        <td>#"+orderId+"</td>\n" +
+                "                        <td>#" + orderId + "</td>\n" +
                 "                    </tr>\n" +
                 "                    <tr>\n" +
                 "                        <td>Order Date:</td>\n" +
@@ -321,7 +321,7 @@ public class EmailTemplateGenerator {
                 "\n";
     }
 
-    private String generateTable(List<CartItems> cartItemsList) {
+    private String generateOrderSummaryTable(List<CartItems> cartItemsList) {
         StringBuilder table = new StringBuilder();
         for (CartItems cartItems : cartItemsList) {
             table.append("<tr><td><img src='cid:").append(cartItems.getBook().getBookImageSrc().substring(cartItems.getBook().getBookImageSrc().lastIndexOf('/') + 1)).append("' style='height: 80px;width: 60px;margin-top:4px;margin-bottom:4px'/></td>")
@@ -362,5 +362,35 @@ public class EmailTemplateGenerator {
                 "</a>" +
                 "        </div>\n" +
                 "\n";
+    }
+
+
+    public String getBookAvailableInStockTemplate(Book book) {
+        return "        <p>We know you have been patiently waiting for <b>" + book.getBookName() + "</b> is now back in stock ! We have limited amount of stock, So hurry to Enigma Bookstore to be one of the lucky shoppers who do.</p>\n" +
+                "        <p>And, be sure to checkout the latest additions to our shop.</p>\n" +
+                "        <p>Happy Shopping.</p>\n" +
+                "        <div class='navbar' style='background-color:#00AAE4;margin-bottom:2%'>\n" +
+                "            <p>WishList Item</p>\n" +
+                "        </div>\n" +
+                "        <table align='center' class='itemstb'>\n" +
+                "            <tr>\n" +
+                "                <th>Book Image</th>" +
+                "                <th>Book Name</th>\n" +
+                "                <th>&nbsp;</th>\n" +
+                "            </tr>\n" +
+                "            <tr>\n" +
+                "                <td>" +
+                "                   <img src='cid:"+book.getBookImageSrc().substring(book.getBookImageSrc().lastIndexOf('/') + 1)+"' style='height: 80px;width: 60px;margin-top:4px;margin-bottom:4px'/>" +
+                "                 </td>"+
+                "               <td><p class='bookName'>" +
+                                   book.getBookName() +
+                "               </p></td>\n" +
+                "                <td>" +
+                "                       <a style='text-decoration: none;border:none;' href='" + httpServletRequest.getHeader("origin") +"'>"+
+                "                           <button class='linkButton'>Buy Now</button>" +
+                "                       </a>" +
+                "                 </td>"+
+                "            </tr>\n" +
+                "        </table>\n";
     }
 }

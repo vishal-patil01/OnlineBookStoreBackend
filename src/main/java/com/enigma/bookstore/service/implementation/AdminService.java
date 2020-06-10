@@ -1,17 +1,19 @@
 package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.dto.BookDTO;
+import com.enigma.bookstore.dto.EmailTemplateDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.CartItems;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.model.WishListItems;
 import com.enigma.bookstore.properties.ApplicationProperties;
+import com.enigma.bookstore.rabbitmq.producer.NotificationSender;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICartItemsRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.service.IAdminService;
-import com.enigma.bookstore.service.ISendNotification;
+import com.enigma.bookstore.util.EmailTemplateGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -23,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +42,10 @@ public class AdminService implements IAdminService {
     private ICartItemsRepository cartItemsRepository;
 
     @Autowired
-    ISendNotification sendNotification;
+    EmailTemplateGenerator emailTemplateGenerator;
+
+    @Autowired
+    NotificationSender notificationSender;
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -81,7 +87,13 @@ public class AdminService implements IAdminService {
     public String updateBook(BookDTO bookDTO, Integer bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Update Operation"));
         if (book.getNoOfCopies() <= 0 && bookDTO.noOfCopies >= book.getNoOfCopies()) {
-            sendNotification.notifyUsers(getSubScribnerList(bookId));
+            List<Book> bookList = new ArrayList<>();
+            bookList.add(book);
+            getSubscribersList(book).forEach(user -> notificationSender
+                    .addToSubscriberQueue(new EmailTemplateDTO(user.getEmail(),
+                            "Your Requested Product Is Now Available To Purchase",
+                            emailTemplateGenerator.getHeader(user.getFullName()) + emailTemplateGenerator.getBookAvailableInStockTemplate(book) + emailTemplateGenerator.getFooter(),
+                            bookList)));
         }
         book.updateBook(bookDTO);
         bookRepository.save(book);
@@ -99,8 +111,8 @@ public class AdminService implements IAdminService {
         return "Book Deleted Successfully";
     }
 
-    private List<User> getSubScribnerList(Integer bookId) {
-        return wishListItemsRepository.findAllByBookId(bookId)
+    private List<User> getSubscribersList(Book book) {
+        return wishListItemsRepository.findAllByBookId(book.getId())
                 .stream()
                 .map(wishListItems -> wishListItems.getWishList().getUser())
                 .collect(Collectors.toList());
