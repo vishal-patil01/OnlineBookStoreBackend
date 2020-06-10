@@ -4,6 +4,7 @@ import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.CartItems;
+import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.model.WishListItems;
 import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IBookRepository;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService implements IAdminService {
@@ -78,6 +80,10 @@ public class AdminService implements IAdminService {
     @Override
     public String updateBook(BookDTO bookDTO, Integer bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Update Operation"));
+        if (book.getNoOfCopies() <= 0 && bookDTO.noOfCopies >= book.getNoOfCopies()) {
+            List<User> subScribnerList = getSubScribnerList(bookId);
+            subScribnerList.forEach(user -> mailService.sendEmail(user.getEmail(), "Book Is Now Available", "Come To Our WebSite"));
+        }
         book.updateBook(bookDTO);
         bookRepository.save(book);
         return "Book Updated successfully.";
@@ -92,5 +98,12 @@ public class AdminService implements IAdminService {
             throw new BookException("Book Can Not Be Deleted. It May Be Added In WishList Or Cart");
         bookRepository.delete(book);
         return "Book Deleted Successfully";
+    }
+
+    private List<User> getSubScribnerList(Integer bookId) {
+        return wishListItemsRepository.findAllByBookId(bookId)
+                .stream()
+                .map(wishListItems -> wishListItems.getWishList().getUser())
+                .collect(Collectors.toList());
     }
 }
