@@ -17,6 +17,7 @@ import com.enigma.bookstore.repository.ICartItemsRepository;
 import com.enigma.bookstore.repository.ICartRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.CartService;
+import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ public class CartServiceTest {
     CartService cartService;
 
     @MockBean
-    JWTToken jwtToken;
+    ITokenGenerator jwtToken;
 
     CartDTO cartDTO;
     BookDTO bookDTO;

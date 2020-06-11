@@ -13,7 +13,7 @@ import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.repository.IWishListRepository;
-import com.enigma.bookstore.util.implementation.JWTToken;
+import com.enigma.bookstore.util.ITokenGenerator;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +49,10 @@ public class WishListServiceTest {
     IUserRepository userRepository;
 
     @Autowired
-    com.enigma.bookstore.service.implementation.WishListService WishListService;
+    IWishListService wishListService;
 
     @MockBean
-    JWTToken jwtToken;
+    ITokenGenerator jwtToken;
 
     BookDTO bookDTO;
     com.enigma.bookstore.model.WishList wishList;
@@ -78,7 +78,7 @@ public class WishListServiceTest {
         when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(new WishList()));
         when(WishListRepository.save(any())).thenReturn(wishListItems);
         when(WishListItemsRepository.save(any())).thenReturn(new WishListItems());
-        String existingBook = WishListService.addToWishList(1, "authorization");
+        String existingBook = wishListService.addToWishList(1, "authorization");
         Assert.assertEquals("Book Added To Wish List Successfully", existingBook);
     }
 
@@ -91,7 +91,7 @@ public class WishListServiceTest {
             when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(new WishList()));
             when(WishListRepository.save(any())).thenReturn(wishListItems);
             when(WishListItemsRepository.findByBookIdAndWishListWishId(any(), any())).thenReturn(wishListItems1);
-            WishListService.addToWishList(1, "authorization");
+            wishListService.addToWishList(1, "authorization");
         } catch (WishListItemsException e) {
             Assert.assertEquals("Book Already Exists In WishList", e.getMessage());
         }
@@ -103,7 +103,7 @@ public class WishListServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
         when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
         when(WishListItemsRepository.findAllByWishListWishId(1)).thenReturn(wishListItems1);
-        List<WishListItems> itemsList = WishListService.fetchWishList("token");
+        List<WishListItems> itemsList = wishListService.fetchWishList("token");
         Assert.assertEquals(wishListItems1, itemsList);
     }
 
@@ -114,7 +114,7 @@ public class WishListServiceTest {
             when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
             when(WishListItemsRepository.findAllByWishListWishId(1)).thenReturn(new ArrayList<>());
-            WishListService.fetchWishList("token");
+            wishListService.fetchWishList("token");
         } catch (WishListItemsException e) {
             Assert.assertEquals("There Is No Books In WishList", e.getMessage());
         }
@@ -126,7 +126,7 @@ public class WishListServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
         when(WishListItemsRepository.findById(1)).thenReturn(Optional.ofNullable(wishListItems));
         when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
-        String existingBook = WishListService.deleteBookFromWishList(1, "token");
+        String existingBook = wishListService.deleteBookFromWishList(1, "token");
         Assert.assertEquals("Book Removed From WishList", existingBook);
     }
 
@@ -137,7 +137,7 @@ public class WishListServiceTest {
             when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(WishListRepository.findByUserId(any())).thenReturn(Optional.of(wishList));
             when(WishListItemsRepository.findAllByWishListWishId(1)).thenReturn(new ArrayList<>());
-            WishListService.deleteBookFromWishList(1, "token");
+            wishListService.deleteBookFromWishList(1, "token");
         } catch (WishListItemsException e) {
             Assert.assertEquals("There Is No Books In WishList", e.getMessage());
         }

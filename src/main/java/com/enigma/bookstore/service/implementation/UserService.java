@@ -11,6 +11,7 @@ import com.enigma.bookstore.service.IUserService;
 import com.enigma.bookstore.service.IWishListService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.implementation.JWTToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,7 +31,7 @@ public class UserService implements IUserService {
     private IUserRepository userRepository;
 
     @Autowired
-    private JWTToken jwtToken;
+    private ITokenGenerator jwtToken;
 
     @Autowired
     IMailService mailService;

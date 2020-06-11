@@ -12,6 +12,7 @@ import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.ICustomerRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.CustomerService;
+import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ public class CustomerServiceTest {
     CustomerService customerService;
 
     @MockBean
-    JWTToken jwtToken;
+    ITokenGenerator jwtToken;
 
     CustomerDTO customerDTO;
     List<Customer> customersList = new ArrayList<>();

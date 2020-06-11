@@ -2,7 +2,11 @@ package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
+import com.enigma.bookstore.dto.UserLoginDTO;
+import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.BookException;
+import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.model.WishList;
@@ -11,20 +15,24 @@ import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.rabbitmq.producer.NotificationSender;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICartItemsRepository;
+import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.service.implementation.AdminService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.util.ITokenGenerator;
+import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import javax.management.Notification;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -40,6 +48,12 @@ public class AdminServiceTest {
 
     @MockBean
     NotificationSender notificationSender;
+
+    @MockBean
+    IUserRepository iUserRepository;
+
+    @MockBean
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @MockBean
     ApplicationProperties applicationProperties;
@@ -58,6 +72,9 @@ public class AdminServiceTest {
 
     @Autowired
     AdminService adminService;
+
+    @MockBean
+    ITokenGenerator jwtToken;
 
     BookDTO bookDTO;
     Book book;
@@ -105,6 +122,7 @@ public class AdminServiceTest {
             Assert.assertEquals("Book Name and Author Name is already exists.", e.getMessage());
         }
     }
+
     @Test
     void givenBookDetails_WhenAllValidationAreTrue_ShouldReturnBookUpdatedSuccessfullyMessage() {
         when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
@@ -124,6 +142,7 @@ public class AdminServiceTest {
             Assert.assertEquals("Book Not Found", e.getMessage());
         }
     }
+
     @Test
     void givenBookDetails_WhenBookExistsAndNotAddedInCartOrWishList_ShouldReturnBookDeletedSuccessfullyMessage() {
         when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));

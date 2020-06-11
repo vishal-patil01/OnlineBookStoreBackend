@@ -13,6 +13,7 @@ import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.*;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -68,7 +69,7 @@ public class OrderServiceTest {
     ICartRepository cartRepository;
 
     @MockBean
-    JWTToken tokenGenerator;
+    ITokenGenerator tokenGenerator;
 
     BookDTO bookDTO;
     Book bookDetails;

@@ -3,7 +3,9 @@ package com.enigma.bookstore.service.implementation;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.EmailTemplateDTO;
 import com.enigma.bookstore.dto.UserLoginDTO;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.BookException;
+import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.CartItems;
 import com.enigma.bookstore.model.User;
@@ -12,10 +14,13 @@ import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.rabbitmq.producer.NotificationSender;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICartItemsRepository;
+import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.service.IAdminService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
+import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +32,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +54,15 @@ public class AdminService implements IAdminService {
 
     @Autowired
     NotificationSender notificationSender;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private IUserRepository userRepository;
+
+    @Autowired
+    private ITokenGenerator jwtToken;
 
     @Autowired
     private ApplicationProperties applicationProperties;

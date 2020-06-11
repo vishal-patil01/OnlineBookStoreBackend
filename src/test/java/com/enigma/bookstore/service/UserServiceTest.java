@@ -12,6 +12,7 @@ import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.UserService;
 import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class UserServiceTest {
     ApplicationProperties applicationProperties;
 
     @MockBean
-    JWTToken jwtToken;
+    ITokenGenerator jwtToken;
 
     @MockBean
     IMailService mailService;
