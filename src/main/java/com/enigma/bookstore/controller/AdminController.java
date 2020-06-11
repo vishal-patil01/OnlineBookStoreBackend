@@ -2,6 +2,7 @@ package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.service.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,11 @@ public class AdminController {
     @PostMapping("/book")
     public ResponseEntity<Response> addBook(@Valid @RequestBody BookDTO bookDTO, BindingResult bindingResult) {
         return getResponseResponseEntity(bindingResult, adminService.addBook(bookDTO));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Response> adminLogin(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult) {
+        return getResponseResponseEntity(bindingResult, adminService.adminLogin(userLoginDTO));
     }
 
     @PostMapping("/image")

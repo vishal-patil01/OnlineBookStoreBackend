@@ -2,6 +2,7 @@ package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.service.implementation.AdminService;
@@ -119,5 +120,20 @@ class AdminControllerTest {
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.message;
         Assert.assertEquals("Book Deleted Successfully", responseMessage);
+    }
+
+
+    @Test
+    void givenUserLoginData_WhenAllValidationAreTrueAndEmailExists_ShouldReturnLoginSuccessfulMessage() throws Exception {
+        UserLoginDTO loginDTO = new UserLoginDTO("sam@gmail.com", "Asdfg@123");
+        String stringConvertDTO = gson.toJson(loginDTO);
+        String message = "Login Successful";
+        when(adminService.adminLogin(any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/admin/login").contentType(MediaType.APPLICATION_JSON)
+                .content(stringConvertDTO)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
     }
 }

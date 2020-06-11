@@ -9,7 +9,7 @@ import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.repository.ICustomerRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.ICustomerService;
-import com.enigma.bookstore.util.IJWTToken;
+import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class CustomerService implements ICustomerService {
     @Autowired
     private IUserRepository userRepository;
     @Autowired
-    private IJWTToken jwtToken;
+    private ITokenGenerator jwtToken;
 
     @Override
     public String addCustomerDetails(CustomerDTO customerDTO, String token) {

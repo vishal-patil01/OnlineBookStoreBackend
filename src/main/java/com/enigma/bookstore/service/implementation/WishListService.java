@@ -13,7 +13,7 @@ import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.repository.IWishListItemsRepository;
 import com.enigma.bookstore.repository.IWishListRepository;
 import com.enigma.bookstore.service.IWishListService;
-import com.enigma.bookstore.util.IJWTToken;
+import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class WishListService implements IWishListService {
     @Autowired
     private IWishListRepository wishListRepository;
     @Autowired
-    private IJWTToken jwtToken;
+    private ITokenGenerator jwtToken;
 
     @Override
     public void createWishList(User user) {

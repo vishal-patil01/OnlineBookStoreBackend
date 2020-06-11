@@ -7,7 +7,7 @@ import com.enigma.bookstore.model.*;
 import com.enigma.bookstore.repository.*;
 import com.enigma.bookstore.service.IOrderService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
-import com.enigma.bookstore.util.IJWTToken;
+import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.IMailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService implements IOrderService {
     @Autowired
-    IJWTToken jwtToken;
+    ITokenGenerator jwtToken;
     @Autowired
     IMailService mailService;
     @Autowired

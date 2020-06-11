@@ -2,6 +2,7 @@ package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.EmailTemplateDTO;
+import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.CartItems;
@@ -109,6 +110,11 @@ public class AdminService implements IAdminService {
             throw new BookException("Book Can Not Be Deleted. It May Be Added In WishList Or Cart");
         bookRepository.delete(book);
         return "Book Deleted Successfully";
+    }
+
+    @Override
+    public String adminLogin(UserLoginDTO userLoginDTO) {
+        return null;
     }
 
     private List<User> getSubscribersList(Book book) {

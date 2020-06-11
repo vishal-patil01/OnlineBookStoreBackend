@@ -14,7 +14,7 @@ import com.enigma.bookstore.repository.ICartItemsRepository;
 import com.enigma.bookstore.repository.ICartRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.ICartService;
-import com.enigma.bookstore.util.IJWTToken;
+import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class CartService implements ICartService {
     @Autowired
     private ICartRepository cartRepository;
     @Autowired
-    private IJWTToken jwtToken;
+    private ITokenGenerator jwtToken;
 
     @Override
     public void createCart(User user) {

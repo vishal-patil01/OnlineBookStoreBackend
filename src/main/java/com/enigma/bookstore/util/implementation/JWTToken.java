@@ -2,7 +2,7 @@ package com.enigma.bookstore.util.implementation;
 
 import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.properties.ApplicationProperties;
-import com.enigma.bookstore.util.IJWTToken;
+import com.enigma.bookstore.util.ITokenGenerator;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Component
-public class JWTToken implements IJWTToken {
+public class JWTToken implements ITokenGenerator {
 
     @Autowired
     private ApplicationProperties applicationProperties;
