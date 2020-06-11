@@ -130,7 +130,27 @@ public class AdminService implements IAdminService {
 
     @Override
     public String adminLogin(UserLoginDTO userLoginDTO) {
-        return null;
+        User user = getUser(userLoginDTO.email);
+        if (user.getUserRole() == UserRole.ADMIN) {
+            boolean isPasswordMatched = bCryptPasswordEncoder.matches(userLoginDTO.password, user.getPassword());
+            if (isPasswordMatched) {
+                Date expirationTime = getExpirationTime(Calendar.DAY_OF_YEAR, 1);
+                return jwtToken.generateToken(user.getId(), expirationTime);
+            }
+            throw new UserException("Enter Valid Password");
+        }
+        throw new UserException("Your Dont Have Admin Privilege");
+    }
+
+    private Date getExpirationTime(Integer timePeriod, Integer value) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(timePeriod, value);
+        return calendar.getTime();
+    }
+
+    private User getUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException("Account With This Email Address Not Exist"));
     }
 
     private List<User> getSubscribersList(Book book) {

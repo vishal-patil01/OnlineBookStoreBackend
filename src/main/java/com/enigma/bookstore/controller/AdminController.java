@@ -11,10 +11,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*", exposedHeaders = "*,")
 @RequestMapping("bookstore/admin")
 public class AdminController {
 
@@ -27,8 +28,14 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> adminLogin(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult) {
-        return getResponseResponseEntity(bindingResult, adminService.adminLogin(userLoginDTO));
+    public ResponseEntity<Response> adminLogin(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletResponse httpServletResponse, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        }
+        String token = adminService.adminLogin(userLoginDTO);
+        httpServletResponse.setHeader("authorization", token);
+        Response response = new Response("Login Successful", "Admin", 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/image")

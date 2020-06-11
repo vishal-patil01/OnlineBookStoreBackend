@@ -163,4 +163,41 @@ public class AdminServiceTest {
             Assert.assertEquals("Book Can Not Be Deleted. It May Be Added In WishList Or Cart", e.getMessage());
         }
     }
+    @Test
+    void givenAdminLoginDTO_WhenAllValidationAreTrue_ShouldReturnLoginSuccessfulMessage() {
+        UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", true, UserRole.ADMIN);
+        User user = new User(registrationDTO);
+        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(bCryptPasswordEncoder.matches(any(), any())).thenReturn(true);
+        when(jwtToken.generateToken(any(), any())).thenReturn("token");
+        String existingBook = adminService.adminLogin(userLoginDTO);
+        Assert.assertEquals("token", existingBook);
+    }
+
+    @Test
+    void givenAdminLoginDTO_WhenEmailAddressIsNotExists_ShouldThrowUserException() {
+        UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+        try {
+            when(iUserRepository.findByEmail(any())).thenThrow(new UserException("Email Address Not Exists"));
+            adminService.adminLogin(userLoginDTO);
+        } catch (UserException e) {
+            Assert.assertEquals("Email Address Not Exists", e.getMessage());
+        }
+    }
+
+    @Test
+    void givenAdminLoginDTO_WhenEmailAddressIsExistsButRoleIsUser_ShouldThrowUserException() {
+        try {
+            UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");
+            UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+            User user = new User(registrationDTO);
+            user.setEmailVerified(true);
+            when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+            when(bCryptPasswordEncoder.matches(any(), any())).thenReturn(false);
+            adminService.adminLogin(userLoginDTO);
+        } catch (UserException e) {
+            Assert.assertEquals("Your Dont Have Admin Privilege", e.getMessage());
+        }
+    }
 }
