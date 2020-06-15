@@ -6,6 +6,7 @@ import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.User;
+import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICustomerRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.ICustomerService;
@@ -20,6 +21,8 @@ public class CustomerService implements ICustomerService {
 
     @Autowired
     private ICustomerRepository customerRepository;
+    @Autowired
+    private IBookRepository bookRepository;
     @Autowired
     private IUserRepository userRepository;
     @Autowired
@@ -39,15 +42,10 @@ public class CustomerService implements ICustomerService {
     }
 
     private String updateCustomerDetails(CustomerDTO customerDTO, Customer customer) {
-        customer.setCustomerAddress(customerDTO.customerAddress);
-        customer.setCustomerLandmark(customerDTO.customerLandmark);
-        customer.setCustomerLocality(customerDTO.customerLocality);
-        customer.setCustomerPinCode(customerDTO.customerPinCode);
-        customer.setCustomerTown(customerDTO.customerTown);
+        customer.updateCustomer(customerDTO);
         customerRepository.save(customer);
         return "Customer Details Updated Successfully";
     }
-
 
     @Override
     public Customer fetchCustomerDetails(AddressType addressType, String token) {
