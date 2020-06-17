@@ -374,11 +374,6 @@ public class EmailTemplateGenerator {
                 "        </div>\n" +
                 "        <table align='center' class='itemstb'>\n" +
                 "            <tr>\n" +
-                "                <th>Book Image</th>" +
-                "                <th>Book Name</th>\n" +
-                "                <th>&nbsp;</th>\n" +
-                "            </tr>\n" +
-                "            <tr>\n" +
                 "                <td>" +
                 "                   <img src='cid:"+book.getBookImageSrc().substring(book.getBookImageSrc().lastIndexOf('/') + 1)+"' style='height: 80px;width: 60px;margin-top:4px;margin-bottom:4px'/>" +
                 "                 </td>"+
