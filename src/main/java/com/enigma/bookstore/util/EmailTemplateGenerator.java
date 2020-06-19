@@ -250,7 +250,7 @@ public class EmailTemplateGenerator {
                 "        <h4>Hello <b> " + userName + " </b></h4>\n";
     }
 
-    public String getOrderPlacedTemplate(List<CartItems> cartItemsList, Double totalPrice, String formattedDate, String address, Integer orderId) {
+    public String getOrderPlacedTemplate(List<CartItems> cartItemsList, Double totalPrice, String formattedDate, String address, String orderId) {
         return "        <p>We have received your order and are working on it now. You'll receive an email when your items are\n" +
                 "            shipped.</p>\n" +
                 "        <p>If you have any questions,Mail us at bookstore.engima@gmail.com</p>\n" +
@@ -363,7 +363,6 @@ public class EmailTemplateGenerator {
                 "        </div>\n" +
                 "\n";
     }
-
 
     public String getBookAvailableInStockTemplate(Book book) {
         return "        <p>We know you have been patiently waiting for <b>" + book.getBookName() + "</b> is now back in stock ! We have limited amount of stock, So hurry to Enigma Bookstore to be one of the lucky shoppers who do.</p>\n" +

@@ -19,7 +19,7 @@ public class OrderController {
 
     @PostMapping("/order/{totalprice}")
     public ResponseEntity<Response> placeOrder(@PathVariable(name = "totalprice") Double totalPrice, @RequestHeader(value = "token", required = false) String token) {
-        Integer orderId = orderService.placeOrder(totalPrice, token);
+        String orderId = orderService.placeOrder(totalPrice, token);
         Response response = new Response("Order Placed Successfully", orderId, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

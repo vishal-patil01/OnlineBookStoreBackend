@@ -30,7 +30,7 @@ public class Orders {
     private Integer id;
     private Double totalPrice;
     @Column(unique = true)
-    private Integer orderId;
+    private String orderId;
     @CreationTimestamp
     private Timestamp orderPlacedDate;
 
@@ -47,7 +47,7 @@ public class Orders {
     @JoinColumn(name = "customer")
     private Customer customer;
 
-    public Orders(User user, Double totalPrice, Customer customerDetails, Integer orderId){
+    public Orders(User user, Double totalPrice, Customer customerDetails, String orderId){
         this.user = user;
         this.customer = customerDetails;
         this.totalPrice = totalPrice;

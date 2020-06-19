@@ -35,12 +35,12 @@ public class OrdersControllerTest {
 
     @Test
     void givenOrderData_WhenAllValidationAreTrue_ShouldReturnOrderSuccessfulMessage() throws Exception {
-        when(orderService.placeOrder(any(), any())).thenReturn(36892);
+        when(orderService.placeOrder(any(), any())).thenReturn("ORD-0000000000001");
         MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/order/1500")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Response responseDto = gson.fromJson(response, Response.class);
-        Double responseMessage = (Double) responseDto.data;
-        Assert.assertEquals(36892.0, responseMessage, 0.0);
+        String responseMessage = responseDto.data.toString();
+        Assert.assertEquals("ORD-0000000000001", responseMessage);
     }
 
     @Test
@@ -57,12 +57,12 @@ public class OrdersControllerTest {
     void givenRequest_WhenCartIsNotEmpty_ShouldReturnCartRecords() throws Exception {
         List<Orders> ordersList = new ArrayList<>();
         Orders orders = new Orders();
-        orders.setOrderId(123456);
+        orders.setOrderId("ORD-0000000000001");
         orders.setCustomer(new Customer());
         ordersList.add(orders);
         when(orderService.fetchOrders(any())).thenReturn(ordersList);
         MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/order")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
-        Assert.assertTrue(response.contains("123456"));
+        Assert.assertTrue(response.contains("ORD-0000000000001"));
     }
 }

@@ -7,16 +7,18 @@ import com.enigma.bookstore.model.*;
 import com.enigma.bookstore.repository.*;
 import com.enigma.bookstore.service.IOrderService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
-import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.IMailService;
+import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +48,7 @@ public class OrderService implements IOrderService {
     String subject = "Your Order Placed Successfully";
 
     @Override
-    public Integer placeOrder(Double totalPrice, String token) {
+    public String placeOrder(Double totalPrice, String token) {
         Cart cart = checkUserAndCartIsExists(token);
         User user = userRepository.findById(jwtToken.verifyToken(token)).orElseThrow(() -> new UserException("User Not Found"));
         Customer customerDetails = customerRepository.findByUserOrderByCustomerIdDesc(cart.getUser()).get(0);
@@ -99,15 +101,17 @@ public class OrderService implements IOrderService {
                 .orElseThrow(() -> new CartException("Cart Not Found"));
     }
 
-    private Integer generateOrderId() {
-        boolean isUnique = false;
-        int orderId = 0;
-        while (!isUnique) {
-            orderId = (int) Math.floor(100000 + Math.random() * 999999);
-            Optional<Orders> orders = orderRepository.findByOrderId(orderId);
-            if (!orders.isPresent())
-                isUnique = true;
-        }
-        return orderId;
+    private String generateOrderId() {
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("order_id").descending());
+        Page<Orders> orders = orderRepository.fetchOrders(pageRequest);
+        if (!orders.hasContent())
+            return String.format("ORD-%013d", 1);
+        String previousOrderId = orders.getContent()
+                .get(0)
+                .getOrderId()
+                .substring(4)
+                .replaceFirst("^0+(?!$)", "");
+        System.out.println(previousOrderId);
+        return String.format("ORD-%013d", Integer.parseInt(previousOrderId) + 1);
     }
 }
