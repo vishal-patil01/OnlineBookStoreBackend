@@ -1,22 +1,33 @@
 package com.enigma.bookstore.controller;
 
+import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CustomerDTO;
+import com.enigma.bookstore.dto.FeedbackDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.UserException;
+import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.Customer;
+import com.enigma.bookstore.model.Feedback;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.service.ICustomerService;
+import com.enigma.bookstore.util.implementation.JWTToken;
 import com.google.gson.Gson;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -32,8 +43,23 @@ public class CustomerControllerTest {
     @MockBean
     private ICustomerService customerService;
 
+    @MockBean
+    JWTToken jwtToken;
+
+    String token;
     Gson gson = new Gson();
     User user = new User();
+    HttpHeaders httpHeaders = new HttpHeaders();
+    List<FeedbackDTO> allFeedback;
+
+    @BeforeEach
+    public void setUp() {
+        httpHeaders.set("token", "Qwebst43Y");
+        token = "asdgj@123";
+        allFeedback = new ArrayList<>();
+        FeedbackDTO feedbackDTO = new FeedbackDTO(4, "nice book", "", "Sam");
+        allFeedback.add(feedbackDTO);
+    }
 
     @Test
     void givenCustomerData_WhenAllValidationAreTrue_ShouldReturnCustomerDetailsSavedSuccessfullyMessage() throws Exception {
@@ -96,6 +122,62 @@ public class CustomerControllerTest {
         } catch (CustomerException e) {
             Assert.assertSame("There is No CustomerData Available", e.getMessage());
         }
+    }
+
+    @Test
+    void givenUserToken_WhenIdentifiedAndAddsFeedback_ShouldReturnProperMessage() throws Exception {
+        FeedbackDTO feedbackDto = new FeedbackDTO(4, "Book is Interesting", "9876543210", "");
+        String feedbackString = new Gson().toJson(feedbackDto);
+        when(customerService.addFeedback(any(), any())).thenReturn("Feedback Added Successfully");
+        MvcResult result = this.mockMvc.perform(post("/bookstore/comment").content(feedbackString)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders))
+                .andReturn();
+        Assert.assertEquals("Feedback Added Successfully",
+                gson.fromJson(result.getResponse().getContentAsString(), Response.class)
+                        .message);
+    }
+
+    @Test
+    void givenFeedbackMessage_WhenNotProper_ShouldReturnProperMessgae() throws Exception {
+        FeedbackDTO feedbackDto = new FeedbackDTO(4, "bad", "9876543210", "");
+        String feedbackString = gson.toJson(feedbackDto);
+        Mockito.when(customerService.addFeedback(any(), any())).
+                thenReturn("Feedback Added Successfully");
+        MvcResult result = this.mockMvc.perform(post("/bookstore/comment").
+                content(feedbackString)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders))
+                .andReturn();
+        String response = result.getResponse().getContentAsString();
+        Assert.assertEquals("Feedback must include 10-200 characters", response);
+    }
+
+    @Test
+    void givenFeedback_WhenNoMessageFound_ShouldReturnProperMessgae() throws Exception {
+        FeedbackDTO feedbackDto = new FeedbackDTO(4, null, "9876543210", "");
+        String feedbackString = new Gson().toJson(feedbackDto);
+        when(customerService.addFeedback(any(), any())).thenReturn("Feedback Added Successfully");
+        MvcResult result = this.mockMvc.perform(post("/bookstore/comment").
+                content(feedbackString)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders))
+                .andReturn();
+        String response = result.getResponse().getContentAsString();
+        Assert.assertEquals("Feedback cannot be null", response);
+    }
+
+    @Test
+    void givenFeedback_WhenNoRatingFound_ShouldReturnProperMessgae() throws Exception {
+        FeedbackDTO feedbackDto = new FeedbackDTO(null, "good book to read", "9876543210", "");
+        String feedbackString = new Gson().toJson(feedbackDto);
+        when(customerService.addFeedback(any(), any())).thenReturn("Feedback Added Successfully");
+        MvcResult result = this.mockMvc.perform(post("/bookstore/comment").
+                content(feedbackString)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders))
+                .andReturn();
+        Assert.assertEquals("Rating cannot be null", result.getResponse().getContentAsString());
     }
 }
 

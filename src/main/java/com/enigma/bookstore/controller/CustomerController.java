@@ -2,6 +2,7 @@ package com.enigma.bookstore.controller;
 
 
 import com.enigma.bookstore.dto.CustomerDTO;
+import com.enigma.bookstore.dto.FeedbackDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.model.Customer;
@@ -37,4 +38,14 @@ public class CustomerController {
         Response response = new Response("Customer Details Fetched Successfully", customerDetails, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping(value = "/comment")
+    public ResponseEntity<Response> addUserFeedback(@Valid @RequestBody FeedbackDTO feedbackDto, BindingResult bindingResult, @RequestHeader String token) {
+        if (bindingResult.hasErrors())
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
+        String feedbackMessage = customerService.addFeedback(token, feedbackDto);
+        Response response = new Response(feedbackMessage, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

@@ -1,10 +1,13 @@
 package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.dto.CustomerDTO;
+import com.enigma.bookstore.dto.FeedbackDTO;
 import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.UserException;
+import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.Customer;
+import com.enigma.bookstore.model.Feedback;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICustomerRepository;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerService implements ICustomerService {
@@ -54,5 +58,10 @@ public class CustomerService implements ICustomerService {
         if (customerList.isEmpty())
             throw new CustomerException("There is No CustomerData Available");
         return customerList.get(0);
+    }
+
+    @Override
+    public String addFeedback(String token, FeedbackDTO feedbackDto) {
+        return null;
     }
 }
