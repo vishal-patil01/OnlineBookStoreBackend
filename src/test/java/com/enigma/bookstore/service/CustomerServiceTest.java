@@ -1,30 +1,39 @@
 package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.configuration.ConfigureRabbitMq;
+import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CustomerDTO;
+import com.enigma.bookstore.dto.FeedbackDTO;
+import com.enigma.bookstore.dto.UserRegistrationDTO;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.CustomerException;
 import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.exception.UserException;
+import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.Customer;
+import com.enigma.bookstore.model.Feedback;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.properties.ApplicationProperties;
+import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.repository.ICustomerRepository;
+import com.enigma.bookstore.repository.IFeedbackRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.CustomerService;
 import com.enigma.bookstore.util.ITokenGenerator;
-import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -32,6 +41,12 @@ public class CustomerServiceTest {
 
     @MockBean
     ICustomerRepository customerRepository;
+
+    @MockBean
+    IBookRepository bookRepository;
+
+    @MockBean
+    IFeedbackRepository feedbackRepository;
 
     @MockBean
     ConfigureRabbitMq configureRabbitMq;
@@ -48,8 +63,21 @@ public class CustomerServiceTest {
     @MockBean
     ITokenGenerator jwtToken;
 
+    String token;
+
     CustomerDTO customerDTO;
     List<Customer> customersList = new ArrayList<>();
+    HttpHeaders httpHeaders=new HttpHeaders();
+    List<FeedbackDTO> allFeedback;
+
+    @BeforeEach
+    public void setUp() {
+        httpHeaders.set("token","Qwebst43Y");
+        token="asdgj@123";
+        allFeedback = new ArrayList<>();
+        FeedbackDTO feedbackDTO = new FeedbackDTO(4, "nice book", "", "Sam");
+        allFeedback.add(feedbackDTO);
+    }
 
     public CustomerServiceTest() {
         customerDTO = new CustomerDTO(425001, "USA", "Street No 34", "London", "Near Hotel", AddressType.HOME);
@@ -115,6 +143,25 @@ public class CustomerServiceTest {
         } catch (CustomerException e) {
             Assert.assertEquals("There is No CustomerData Available", e.getMessage());
         }
+    }
+
+    @Test
+    void givenFeedback_WhenProper_ShouldReturnTrue(){
+        FeedbackDTO feedbackDto=new FeedbackDTO(3,"Good Book","9765432133","");
+        String isbn = feedbackDto.isbNumber;
+        BookDTO bookDto = new BookDTO("998542365", "Into the air","Jack", 20, 5,
+                "About an adventure", "sdfsfd", 2014);
+        Book book = new Book(bookDto);
+        book.setId(3);
+        Feedback feedback=new Feedback(5,3,"Good Book",book);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user = new User(registrationDTO);
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(bookRepository.findByIsbnNumber(isbn)).thenReturn(Optional.of(book));
+        when(feedbackRepository.save(any())).thenReturn(feedback);
+        String response = customerService.addFeedback(token,feedbackDto);
+        Assert.assertEquals("Thank you For your Feedback ",response);
     }
 }
 
