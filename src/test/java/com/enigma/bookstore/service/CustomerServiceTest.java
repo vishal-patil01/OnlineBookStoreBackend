@@ -163,4 +163,26 @@ public class CustomerServiceTest {
         String response = customerService.addFeedback(token,feedbackDto);
         Assert.assertEquals("Thank you For your Feedback ",response);
     }
+
+    @Test
+    void givenISBN_WhenIdentified_ShouldReturnProperMessage(){
+        FeedbackDTO feedbackDto=new FeedbackDTO(3,"Good Book","9765432133","");
+        BookDTO bookDto = new BookDTO("998542365", "Into the air","Jack", 20, 5,
+                "About an adventure", "sdfsfd", 2014);
+        Book book = new Book(bookDto);
+        book.setId(3);
+        List<Integer> feedbackIds=new ArrayList<>();
+        Feedback feedback=new Feedback(5,3,"Good Book",book);
+        feedback.id=1;
+        feedbackIds.add(feedback.id);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user = new User(registrationDTO);
+        when(bookRepository.findByIsbnNumber(any())).thenReturn(Optional.of(book));
+        when(feedbackRepository.getFeedbackIds(anyInt())).thenReturn(feedbackIds);
+        when(feedbackRepository.findById(any())).thenReturn(Optional.of(feedback));
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+        List<FeedbackDTO> response = customerService.getAllFeedback(feedbackDto.isbNumber);
+        Assert.assertEquals("Good Book",response.get(0).feedbackMessage);
+    }
 }
+

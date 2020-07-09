@@ -92,8 +92,23 @@ public class CustomerService implements ICustomerService {
         }
         throw new UserException("You had submitted feedback previously");
     }
+
     @Override
     public List<FeedbackDTO> getAllFeedback(String isbn) {
-     return null;
+        Optional<Book> book = bookRepository.findByIsbnNumber(isbn);
+        Book bookData = book.get();
+        Integer id = bookData.getId();
+        List<Integer> feedbackIds = feedbackRepository.getFeedbackIds(id);
+        List<FeedbackDTO> feedbackList = new ArrayList<>();
+        for (Integer feedbackId : feedbackIds) {
+            Optional<Feedback> feedback = feedbackRepository.findById(feedbackId);
+            Feedback feedback1 = feedback.get();
+            int userId = feedback1.userId;
+            Optional<User> userById = userRepository.findById(userId);
+            String userName = userById.get().getFullName();
+            feedbackList.add(new FeedbackDTO(feedback1.rating, feedback1.feedbackMessage, "", userName));
+        }
+        return feedbackList;
     }
+
 }
