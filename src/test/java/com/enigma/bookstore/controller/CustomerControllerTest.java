@@ -179,5 +179,23 @@ public class CustomerControllerTest {
                 .andReturn();
         Assert.assertEquals("Rating cannot be null", result.getResponse().getContentAsString());
     }
+
+    @Test
+    void givenIsbnNo_WhenProper_ShouldReturnAllFeedBack() throws Exception {
+        BookDTO bookDTO = new BookDTO("836655645456", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        BookDTO bookDTO2 = new BookDTO("836655645456", "Bags Of Book", "Sudha Krishnan", 400.0, 2, "Stories", "/temp/pic01", 2014);
+        Book book2 = new Book(bookDTO2);
+        Feedback feedback = new Feedback(3, 4, "Book is Interesting", book);
+        Feedback feedback1 = new Feedback(4, 3, "Nice Book to Read", book2);
+        List<Feedback> feedbackList = new ArrayList<>();
+        feedbackList.add(feedback);
+        feedbackList.add(feedback1);
+        Mockito.when(customerService.getAllFeedback(any())).thenReturn(allFeedback);
+        MvcResult result = this.mockMvc.perform(get("/bookstore/comments?isbnNumber=")).andReturn();
+        Assert.assertEquals(200, result.getResponse().getStatus());
+        Assert.assertEquals("Feedback Fetched Successfully", gson.fromJson(result.getResponse().
+                getContentAsString(), Response.class).message);
+    }
 }
 

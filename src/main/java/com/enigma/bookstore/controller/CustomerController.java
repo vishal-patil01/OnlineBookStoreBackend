@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -48,4 +49,10 @@ public class CustomerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/comments")
+    public ResponseEntity<Response> getBookFeedback(@RequestParam("isbnNumber") String isbnNumber) {
+        List<FeedbackDTO> allFeedback = customerService.getAllFeedback(isbnNumber);
+        Response response = new Response("Feedback Fetched Successfully", allFeedback, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
