@@ -30,11 +30,11 @@ public class CustomerService implements ICustomerService {
     @Autowired
     private IBookRepository bookRepository;
     @Autowired
+    private IFeedbackRepository feedbackRepository;
+    @Autowired
     private IUserRepository userRepository;
     @Autowired
     private ITokenGenerator jwtToken;
-    @Autowired
-    private IFeedbackRepository feedbackRepository;
 
     @Override
     public String addCustomerDetails(CustomerDTO customerDTO, String token) {
@@ -110,8 +110,21 @@ public class CustomerService implements ICustomerService {
         }
         return feedbackList;
     }
+
     @Override
     public List<FeedbackDTO> getUserFeedback(Integer bookId, String token) {
-     return null;
+        int userId = jwtToken.verifyToken(token);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException("User Not Found"));
+        List<FeedbackDTO> feedbackList = new ArrayList<>();
+        String userName = user.getFullName();
+        Integer feedbackId = feedbackRepository.getFeedbackId(userId, bookId);
+        if (feedbackId == null) {
+            throw new UserException("Feedback not found for this user");
+        } else {
+            Optional<Feedback> feedback = feedbackRepository.findById(feedbackId);
+            Feedback feedbackDetails = feedback.get();
+            feedbackList.add(new FeedbackDTO(feedbackDetails.rating, feedbackDetails.feedbackMessage, "", userName));
+            return feedbackList;
+        }
     }
 }

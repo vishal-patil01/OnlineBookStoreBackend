@@ -184,5 +184,21 @@ public class CustomerServiceTest {
         List<FeedbackDTO> response = customerService.getAllFeedback(feedbackDto.isbNumber);
         Assert.assertEquals("Good Book",response.get(0).feedbackMessage);
     }
+
+    @Test
+    void givenUserToken_WhenIdentified_ShouldReturnProperMessage() {
+        BookDTO bookDto = new BookDTO("998542365", "Into the air","Jack", 20, 5,
+                "About an adventure", "sdfsfd", 2014);
+        Book book = new Book(bookDto);
+        book.setId(3);
+        Feedback feedback=new Feedback(5,3,"Good Book",book);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user = new User(registrationDTO);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+        when(jwtToken.verifyToken(anyString())).thenReturn(1);
+        when(feedbackRepository.findById(any())).thenReturn(Optional.of(feedback));
+        List<FeedbackDTO> response = customerService.getUserFeedback(3,token);
+        Assert.assertEquals("Good Book",response.get(0).feedbackMessage);
+    }
 }
 
