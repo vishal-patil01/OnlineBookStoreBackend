@@ -15,4 +15,6 @@ public interface ICustomerService {
     String addFeedback(String token, FeedbackDTO feedbackDto);
 
     List<FeedbackDTO> getAllFeedback(String isbnNumber);
+
+    List<FeedbackDTO> getUserFeedback(Integer id, String token);
 }

@@ -55,4 +55,11 @@ public class CustomerController {
         Response response = new Response("Feedback Fetched Successfully", allFeedback, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/customer/feedback")
+    public ResponseEntity<Response> getCustomerFeedback(@RequestParam("bookId") Integer bookId, @RequestHeader String token) {
+        List<FeedbackDTO> customerFeedback = customerService.getUserFeedback(bookId, token);
+        Response response = new Response("User Feedback Fetched Successfully", customerFeedback, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
