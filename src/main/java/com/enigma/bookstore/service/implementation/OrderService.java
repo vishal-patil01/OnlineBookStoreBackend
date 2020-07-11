@@ -105,13 +105,12 @@ public class OrderService implements IOrderService {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("order_id").descending());
         Page<Orders> orders = orderRepository.fetchOrders(pageRequest);
         if (!orders.hasContent())
-            return String.format("ORD-%013d", 1);
+            return String.format("%08d", 1);
         String previousOrderId = orders.getContent()
                 .get(0)
                 .getOrderId()
                 .substring(4)
                 .replaceFirst("^0+(?!$)", "");
-        System.out.println(previousOrderId);
-        return String.format("ORD-%013d", Integer.parseInt(previousOrderId) + 1);
+        return String.format("%08d", Integer.parseInt(previousOrderId) + 1);
     }
 }

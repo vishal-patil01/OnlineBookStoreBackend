@@ -28,12 +28,15 @@ public class BookService implements IBookService {
 
     @Override
     public Page<Book> fetchBooks(String searchText, int pageNo, FilterAttributes filterAttributes) {
-        PageRequest pageRequest = PageRequest.of(pageNo-1, 12, filterAttributes.sort);
+        if (pageNo <= 0)
+            throw new BookException("Invalid Page Number");
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, 12, filterAttributes.sort);
         Page<Book> books = bookRepository.fetchBooks(pageRequest, searchText);
         if (books.hasContent())
             return books;
         throw new BookException("There Are No Books Available");
     }
+
     @SneakyThrows
     @Override
     public Resource loadImages(String fileName) {

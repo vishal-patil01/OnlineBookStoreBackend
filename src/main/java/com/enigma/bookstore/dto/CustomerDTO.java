@@ -15,7 +15,7 @@ public class CustomerDTO {
     public Integer customerPinCode;
 
     @NotNull
-    @Pattern(regexp = "^[A-Za-z]+[ ]*[A-Za-z]{2,}$")
+    @Pattern(regexp = "^[A-Za-z .]{3,}")
     public String customerLocality;
 
     @NotNull
@@ -23,11 +23,11 @@ public class CustomerDTO {
     public String customerAddress;
 
     @NotNull
-    @Pattern(regexp = "^[A-Za-z]+[ ]*[A-Za-z]{2,}$")
+    @Pattern(regexp = "^[A-Za-z .]{3,}")
     public String customerTown;
 
     @NotNull
-    @Pattern(regexp = "^.{3,50}$")
+    @Pattern(regexp = "^[A-Za-z .]{3,}")
     public String customerLandmark;
 
     @NotNull
