@@ -82,6 +82,8 @@ public class UserService implements IUserService {
         String url = emailTemplateGenerator.getHeader(user.getFullName()) + getURL(generateToken, httpServletRequest) + emailTemplateGenerator.getFooter();
         String emailSubject = getEmailSubject(httpServletRequest);
         mailService.sendEmail(email, emailSubject, url);
+        if (httpServletRequest.getHeader("Referer").contains("forget"))
+            return "Reset Password Link Has Been Sent";
         return "Verification Email Has Been Sent";
     }
 
