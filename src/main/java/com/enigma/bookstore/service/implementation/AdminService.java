@@ -83,7 +83,7 @@ public class AdminService implements IAdminService {
 
     @Override
     public String uploadImage(MultipartFile file) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename()).replace(" ","").toLowerCase();
         String fileBasePath = System.getProperty("user.dir") + applicationProperties.getUploadDir();
         if (!(fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png"))) {
             throw new BookException("Only Image Files Can Be Uploaded");
