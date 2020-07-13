@@ -68,7 +68,9 @@ public class AdminService implements IAdminService {
     private ApplicationProperties applicationProperties;
 
     @Override
-    public String addBook(BookDTO bookDTO) {
+    public String addBook(BookDTO bookDTO, String token) {
+        if (!checkIsAuthorizedUser(token))
+            throw new UserException("User Dont Have Admin Privilege");
         Book book = new Book(bookDTO);
         boolean isIsbnNumberPresent = bookRepository.findByIsbnNumber(bookDTO.isbnNumber).isPresent();
         boolean isBookNamePresent = bookRepository.findByBookNameAndAuthorName(bookDTO.bookName, bookDTO.authorName).isPresent();
@@ -82,8 +84,10 @@ public class AdminService implements IAdminService {
     }
 
     @Override
-    public String uploadImage(MultipartFile file) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename()).replace(" ","").toLowerCase();
+    public String uploadImage(MultipartFile file,String token) {
+        if (!checkIsAuthorizedUser(token))
+            throw new UserException("User Dont Have Admin Privilege");
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename()).replace(" ", "").toLowerCase();
         String fileBasePath = System.getProperty("user.dir") + applicationProperties.getUploadDir();
         if (!(fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png"))) {
             throw new BookException("Only Image Files Can Be Uploaded");
@@ -101,7 +105,9 @@ public class AdminService implements IAdminService {
     }
 
     @Override
-    public String updateBook(BookDTO bookDTO, Integer bookId) {
+    public String updateBook(BookDTO bookDTO, Integer bookId, String token) {
+        if (!checkIsAuthorizedUser(token))
+            throw new UserException("User Dont Have Admin Privilege");
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Update Operation"));
         if (book.getNoOfCopies() <= 0 && bookDTO.noOfCopies >= book.getNoOfCopies()) {
             List<Book> bookList = new ArrayList<>();
@@ -115,17 +121,6 @@ public class AdminService implements IAdminService {
         book.updateBook(bookDTO);
         bookRepository.save(book);
         return "Book Updated successfully.";
-    }
-
-    @Override
-    public String deleteBook(Integer bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book Not Found during Delete Operation"));
-        List<WishListItems> wishListItemsList = wishListItemsRepository.findAllByBookId(bookId);
-        List<CartItems> cartItemsList = cartItemsRepository.findAllByBookId(bookId);
-        if (!cartItemsList.isEmpty() || !wishListItemsList.isEmpty())
-            throw new BookException("Book Can Not Be Deleted. It May Be Added In WishList Or Cart");
-        bookRepository.delete(book);
-        return "Book Deleted Successfully";
     }
 
     @Override
@@ -158,5 +153,12 @@ public class AdminService implements IAdminService {
                 .stream()
                 .map(wishListItems -> wishListItems.getWishList().getUser())
                 .collect(Collectors.toList());
+    }
+
+    private Boolean checkIsAuthorizedUser(String token) {
+        int userId = jwtToken.verifyToken(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User Not Exist"));
+        return user.getUserRole().equals(UserRole.ADMIN);
     }
 }

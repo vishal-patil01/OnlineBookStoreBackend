@@ -3,7 +3,6 @@ package com.enigma.bookstore.controller;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserLoginDTO;
-import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.service.implementation.AdminService;
 import com.google.gson.Gson;
@@ -47,7 +46,7 @@ class AdminControllerTest {
         bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
         list.add(bookDTO);
         String toJson = gson.toJson(bookDTO);
-        when(adminService.addBook(any())).thenReturn("Added");
+        when(adminService.addBook(any(), any())).thenReturn("Added");
         this.mockMvc.perform(post("/bookstore/admin/book").content(toJson)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
@@ -102,7 +101,7 @@ class AdminControllerTest {
         bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
         Book book = new Book(bookDTO);
         String toJson = gson.toJson(book);
-        when(adminService.updateBook(any(), any())).thenReturn("Book Updated Successfully");
+        when(adminService.updateBook(any(), any(), any())).thenReturn("Book Updated Successfully");
         MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/admin/book/1").content(toJson)
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
@@ -110,18 +109,6 @@ class AdminControllerTest {
         String responseMessage = responseDto.message;
         Assert.assertEquals("Book Updated Successfully", responseMessage);
     }
-
-    @Test
-    void givenBookId_WhenGetResponse_ItShouldReturnBookDeletedSuccessfully() throws Exception {
-        bookDTO = new BookDTO("136655645456L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
-        when(adminService.deleteBook(any())).thenReturn("Book Deleted Successfully");
-        MvcResult mvcResult = this.mockMvc.perform(delete("/bookstore/admin/book/1")).andReturn();
-        String response = mvcResult.getResponse().getContentAsString();
-        Response responseDto = gson.fromJson(response, Response.class);
-        String responseMessage = responseDto.message;
-        Assert.assertEquals("Book Deleted Successfully", responseMessage);
-    }
-
 
     @Test
     void givenUserLoginData_WhenAllValidationAreTrueAndEmailExists_ShouldReturnLoginSuccessfulMessage() throws Exception {

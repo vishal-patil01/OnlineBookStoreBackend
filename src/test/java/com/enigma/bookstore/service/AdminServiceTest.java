@@ -21,7 +21,6 @@ import com.enigma.bookstore.service.implementation.AdminService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
 import com.enigma.bookstore.util.ITokenGenerator;
-import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,6 +80,7 @@ public class AdminServiceTest {
     com.enigma.bookstore.model.WishList wishList;
     com.enigma.bookstore.model.WishListItems wishListItems;
     List<WishListItems> wishListItems1;
+    User user;
 
     @BeforeEach
     void setUp() {
@@ -93,21 +93,27 @@ public class AdminServiceTest {
         wishListItems1.add(wishListItems);
         wishList.setWishId(1);
         wishList.setWishListItems(wishListItems1);
+        UserRegistrationDTO adminDTO = new UserRegistrationDTO("Admin", "admin@gmail.com", "Sam@12345", "9874563210", true, UserRole.ADMIN);
+        user = new User(adminDTO);
     }
 
     @Test
     void givenBookData_WhenAllValidationAreTrue_ShouldReturnBookAddedMessage() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(iUserRepository.findById(any())).thenReturn(Optional.of(user));
         bookDTO = new BookDTO("13665564556L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
         when(bookStoreRepository.save(any())).thenReturn(new Book());
-        String existingBook = adminService.addBook(bookDTO);
+        String existingBook = adminService.addBook(bookDTO, "token");
         Assert.assertEquals("Book Added successfully.", existingBook);
     }
 
     @Test
     void givenSameBookDetails_WhenGetResponse_ShouldThrowIsbnNumberAlreadyExistsException() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(iUserRepository.findById(any())).thenReturn(Optional.of(user));
         bookDTO = new BookDTO("13665564556L", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
         when(bookStoreRepository.save(any())).thenReturn(new Book());
-        String existingBook = adminService.addBook(bookDTO);
+        String existingBook = adminService.addBook(bookDTO, "token");
         Assert.assertEquals("Book Added successfully.", existingBook);
     }
 
@@ -125,44 +131,28 @@ public class AdminServiceTest {
 
     @Test
     void givenBookDetails_WhenAllValidationAreTrue_ShouldReturnBookUpdatedSuccessfullyMessage() {
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(iUserRepository.findById(any())).thenReturn(Optional.of(user));
         when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
         when(wishListItemsRepository.findAllByBookId(any())).thenReturn(wishListItems1);
         when(emailTemplateGenerator.getBookAvailableInStockTemplate(any())).thenReturn("Shop Now Book Is Available");
-        String existingBook = adminService.updateBook(bookDTO, 1);
+        String existingBook = adminService.updateBook(bookDTO, 1, "token");
         Assert.assertEquals("Book Updated successfully.", existingBook);
     }
 
     @Test
     void givenBookDetails_WhenBookNotFound_ShouldThrowBookNotFoundException() {
         try {
+            when(jwtToken.verifyToken(any())).thenReturn(1);
+            when(iUserRepository.findById(any())).thenReturn(Optional.of(user));
             when(bookStoreRepository.findById(any())).thenThrow(new BookException("Book Not Found"));
             when(wishListItemsRepository.findAllByBookId(any())).thenReturn(wishListItems1);
-            adminService.updateBook(bookDTO, 1);
+            adminService.updateBook(bookDTO, 1, "token");
         } catch (BookException e) {
             Assert.assertEquals("Book Not Found", e.getMessage());
         }
     }
 
-    @Test
-    void givenBookDetails_WhenBookExistsAndNotAddedInCartOrWishList_ShouldReturnBookDeletedSuccessfullyMessage() {
-        when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
-        when(wishListItemsRepository.findAllByBookId(any())).thenReturn(new ArrayList<>());
-        when(cartItemsRepository.findAllByBookId(any())).thenReturn(new ArrayList<>());
-        String existingBook = adminService.deleteBook(1);
-        Assert.assertEquals("Book Deleted Successfully", existingBook);
-    }
-
-    @Test
-    void givenBookDetails_WhenBookExistsAndAddedInCartOrWishList_ShouldReturnBookException() {
-        try {
-            when(bookStoreRepository.findById(any())).thenReturn(java.util.Optional.of(new Book()));
-            when(wishListItemsRepository.findAllByBookId(any())).thenReturn(wishListItems1);
-            when(cartItemsRepository.findAllByBookId(any())).thenReturn(new ArrayList<>());
-            adminService.deleteBook(1);
-        } catch (BookException e) {
-            Assert.assertEquals("Book Can Not Be Deleted. It May Be Added In WishList Or Cart", e.getMessage());
-        }
-    }
     @Test
     void givenAdminLoginDTO_WhenAllValidationAreTrue_ShouldReturnLoginSuccessfulMessage() {
         UserLoginDTO userLoginDTO = new UserLoginDTO("sam@gmail.com", "Sam@123");

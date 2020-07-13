@@ -23,8 +23,8 @@ public class AdminController {
     IAdminService adminService;
 
     @PostMapping("/book")
-    public ResponseEntity<Response> addBook(@Valid @RequestBody BookDTO bookDTO, BindingResult bindingResult) {
-        return getResponseResponseEntity(bindingResult, adminService.addBook(bookDTO));
+    public ResponseEntity<Response> addBook(@Valid @RequestBody BookDTO bookDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
+        return getResponseResponseEntity(bindingResult, adminService.addBook(bookDTO, token));
     }
 
     @PostMapping("/login")
@@ -39,23 +39,16 @@ public class AdminController {
     }
 
     @PostMapping("/image")
-    public ResponseEntity<Response> uploadImage(@RequestParam("file") MultipartFile file) {
-        String fileDownloadURL = adminService.uploadImage(file);
-        Response response = new Response("Image Loaded Successfully", fileDownloadURL, 200);
+    public ResponseEntity<Response> uploadImage(@RequestParam("file") MultipartFile file, @RequestHeader(value = "token", required = false) String token) {
+        String fileDownloadURL = adminService.uploadImage(file, token);
+        Response response = new Response("Image UpLoaded Successfully", fileDownloadURL, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/book/{bookid}")
-    public ResponseEntity<Response> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable(name = "bookid") Integer bookId, BindingResult bindingResult) {
-        return getResponseResponseEntity(bindingResult, adminService.updateBook(bookDTO, bookId));
+    public ResponseEntity<Response> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable(name = "bookid") Integer bookId, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
+        return getResponseResponseEntity(bindingResult, adminService.updateBook(bookDTO, bookId, token));
     }
-    @DeleteMapping("/book/{bookid}")
-    public ResponseEntity<Response> deleteBook(@PathVariable(name = "bookid") Integer bookId) {
-        String message = adminService.deleteBook(bookId);
-        Response response = new Response(message, null, 200);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
 
     private ResponseEntity<Response> getResponseResponseEntity(BindingResult bindingResult, String serviceResponse) {
         if (bindingResult.hasErrors()) {
