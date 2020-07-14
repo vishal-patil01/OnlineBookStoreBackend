@@ -22,8 +22,4 @@ public interface IWishListItemsRepository extends JpaRepository<WishListItems, I
     Integer deleteWishItems(@Param("bookId") Integer bookId, @Param("wishListId") Integer wishListId);
 
     List<WishListItems> findByBookIdAndWishListWishId(Integer bookId, Integer wishListId);
-
-    @Transactional
-    @Modifying
-    void deleteByBookIdAndWishList_WishId(Integer bookId, Integer wishListId);
 }

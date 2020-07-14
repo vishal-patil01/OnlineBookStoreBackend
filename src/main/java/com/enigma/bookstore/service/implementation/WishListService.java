@@ -66,6 +66,9 @@ public class WishListService implements IWishListService {
     @Override
     public String deleteBookFromWishList(Integer bookId, String token) {
         WishList wishList = checkUserAndWishListIsExists(token);
+        List<WishListItems> wishListItems = wishListItemsRepository.findByBookIdAndWishListWishId(bookId, wishList.getWishId());
+        if (wishListItems.isEmpty())
+            throw new WishListItemsException("No Such Book In Wish List");
         wishListItemsRepository.deleteWishItems(bookId, wishList.getWishId());
         return "Book Removed From WishList";
     }

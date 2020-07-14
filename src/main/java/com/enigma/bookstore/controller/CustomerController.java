@@ -34,7 +34,7 @@ public class CustomerController {
     }
 
     @GetMapping("/customer/{addresstype}")
-    public ResponseEntity<Response> addCustomerDetails(@PathVariable(name = "addresstype") AddressType addressType, @RequestHeader(value = "token", required = false) String token) {
+    public ResponseEntity<Response> fetchCustomerDetails(@PathVariable(name = "addresstype") AddressType addressType, @RequestHeader(value = "token", required = false) String token) {
         Customer customerDetails = customerService.fetchCustomerDetails(addressType, token);
         Response response = new Response("Customer Details Fetched Successfully", customerDetails, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);

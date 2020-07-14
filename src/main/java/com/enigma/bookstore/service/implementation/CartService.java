@@ -67,9 +67,9 @@ public class CartService implements ICartService {
     @Override
     public String deleteBookFromCart(Integer cartItemId, String token) {
         checkUserAndCartIsExists(token);
-        CartItems cartBook = getCartItems(cartItemId);
-        cartItemsRepository.delete(cartBook);
-        return "Cart Deleted Successfully";
+        CartItems cartItems = getCartItems(cartItemId);
+        cartItemsRepository.delete(cartItems);
+        return "Book Removed From Cart";
     }
 
     @Override
