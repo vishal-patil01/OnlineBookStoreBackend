@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.Column;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -25,9 +26,11 @@ public class BookDTO {
     public String authorName;
 
     @NotNull
+    @Min(value=1,message="Price Must Be Greater Than 0")
     public double bookPrice;
 
     @NotNull
+    @Min(value=1,message="No. Of Copies Must Be Greater Than 0")
     public int noOfCopies;
 
     @Length(min = 10, max = 1000, message = "Minimum Details Should Be More Than 10 Characters.")

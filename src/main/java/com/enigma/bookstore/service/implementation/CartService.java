@@ -42,13 +42,13 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public String addToCart(CartDTO bookCartDTO, String token) {
+    public String addToCart(CartDTO cartDTO, String token) {
         Cart cart = checkUserAndCartIsExists(token);
-        Book book = bookRepository.findById(bookCartDTO.id)
+        Book book = bookRepository.findById(cartDTO.id)
                 .orElseThrow(() -> new BookException("Book Not Found"));
         List<CartItems> bookAlreadyExist = cartItemsRepository.findByBookIdAndCart_CardId(book.getId(), cart.getCardId());
         if (bookAlreadyExist.isEmpty()) {
-            CartItems cartBook = new CartItems(bookCartDTO, book, cart);
+            CartItems cartBook = new CartItems(cartDTO, book, cart);
             cartItemsRepository.save(cartBook);
             return "Book Added To Cart Successfully";
         }

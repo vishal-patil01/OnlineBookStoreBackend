@@ -45,8 +45,6 @@ public class OrderService implements IOrderService {
     @Autowired
     IOrderProductsRepository orderProductsRepository;
 
-    String subject = "Your Order Placed Successfully";
-
     @Override
     public String placeOrder(Double totalPrice, String token) {
         Cart cart = checkUserAndCartIsExists(token);
@@ -67,7 +65,7 @@ public class OrderService implements IOrderService {
                 + orderEmailTemplate.getOrderPlacedTemplate(cartItemsList, totalPrice, getFormattedDate(new Timestamp(System.currentTimeMillis()).toString()), customerAddress, savedOrder.getOrderId())
                 + orderEmailTemplate.getFooter();
         cartItemsRepository.deleteCartItems(cart.getCardId());
-        mailService.sendEmail(user.getEmail(), subject, message, bookList);
+        mailService.sendEmail(user.getEmail(), "Your Order Placed Successfully", message, bookList);
         return savedOrder.getOrderId();
     }
 

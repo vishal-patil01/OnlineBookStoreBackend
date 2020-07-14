@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,7 @@ public class CartController {
     ICartService bookCartService;
 
     @PostMapping("/cart")
-    public ResponseEntity<Response> addToCart(@RequestBody CartDTO bookCartDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
+    public ResponseEntity<Response> addToCart(@Valid @RequestBody CartDTO bookCartDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new CartException("Invalid Data !!! Please Enter Valid Data");
         String message = bookCartService.addToCart(bookCartDTO, token);
