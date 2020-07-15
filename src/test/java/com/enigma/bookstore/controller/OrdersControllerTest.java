@@ -1,6 +1,8 @@
 package com.enigma.bookstore.controller;
 
+import com.enigma.bookstore.dto.OrderDTO;
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.enums.AddressType;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.Orders;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -35,19 +38,26 @@ public class OrdersControllerTest {
 
     @Test
     void givenOrderData_WhenAllValidationAreTrue_ShouldReturnOrderSuccessfulMessage() throws Exception {
-        when(orderService.placeOrder(any(), any())).thenReturn("ORD-0000000000001");
-        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/order/1500")).andReturn();
+        OrderDTO orderDTO = new OrderDTO(AddressType.HOME, 200.0);
+        String jsonData = gson.toJson(orderDTO);
+        when(orderService.placeOrder(any(), any())).thenReturn("00000001");
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/order").contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.data.toString();
-        Assert.assertEquals("ORD-0000000000001", responseMessage);
+        Assert.assertEquals("00000001", responseMessage);
     }
 
     @Test
     void givenOrderData_WhenUserNotFound_ShouldThrowUserException() throws Exception {
+        OrderDTO orderDTO = new OrderDTO(AddressType.HOME, 200.0);
+        String jsonData = gson.toJson(orderDTO);
         when(orderService.placeOrder(any(), any())).thenThrow(new UserException("User Not Found"));
-        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/order/1500")).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/order").contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
+        System.out.println(response);
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.message;
         Assert.assertEquals("User Not Found", responseMessage);
@@ -57,12 +67,12 @@ public class OrdersControllerTest {
     void givenRequest_WhenCartIsNotEmpty_ShouldReturnCartRecords() throws Exception {
         List<Orders> ordersList = new ArrayList<>();
         Orders orders = new Orders();
-        orders.setOrderId("ORD-0000000000001");
+        orders.setOrderId("00000001");
         orders.setCustomer(new Customer());
         ordersList.add(orders);
         when(orderService.fetchOrders(any())).thenReturn(ordersList);
         MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/order")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
-        Assert.assertTrue(response.contains("ORD-0000000000001"));
+        Assert.assertTrue(response.contains("00000001"));
     }
 }

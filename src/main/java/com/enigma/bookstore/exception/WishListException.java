@@ -8,3 +8,4 @@ public class WishListException extends RuntimeException {
         super(message);
     }
 }
+

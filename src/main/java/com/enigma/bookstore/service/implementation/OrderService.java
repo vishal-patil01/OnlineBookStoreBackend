@@ -1,6 +1,8 @@
 package com.enigma.bookstore.service.implementation;
 
+import com.enigma.bookstore.dto.OrderDTO;
 import com.enigma.bookstore.exception.CartException;
+import com.enigma.bookstore.exception.CartItemsException;
 import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.*;
@@ -46,13 +48,15 @@ public class OrderService implements IOrderService {
     IOrderProductsRepository orderProductsRepository;
 
     @Override
-    public String placeOrder(Double totalPrice, String token) {
+    public String placeOrder(OrderDTO orderDTO, String token) {
         Cart cart = checkUserAndCartIsExists(token);
-        User user = userRepository.findById(jwtToken.verifyToken(token)).orElseThrow(() -> new UserException("User Not Found"));
-        Customer customerDetails = customerRepository.findByUserOrderByCustomerIdDesc(cart.getUser()).get(0);
-        Orders orders = new Orders(cart.getUser(), totalPrice, customerDetails, generateOrderId());
-        Orders savedOrder = orderRepository.save(orders);
         List<CartItems> cartItemsList = cartItemsRepository.findAllByCart_CardId(cart.getCardId());
+        if (cartItemsList.isEmpty())
+            throw new CartItemsException("There Are No Items In A Cart");
+        User user = userRepository.findById(jwtToken.verifyToken(token)).orElseThrow(() -> new UserException("User Not Found"));
+        Customer customerDetails = customerRepository.findByUserIdAndAndCustomerAddressType(user.getId(), orderDTO.addressType).get(0);
+        Orders orders = new Orders(cart.getUser(), orderDTO.totalPrice, customerDetails, generateOrderId());
+        Orders savedOrder = orderRepository.save(orders);
         cartItemsList.forEach(cartBook -> bookRepository
                 .updateBookQuantity(cartBook.getBook().getId(), cartBook.getQuantity()));
         cartItemsList.forEach(cartBook -> {
@@ -62,7 +66,7 @@ public class OrderService implements IOrderService {
         List<Book> bookList = cartItemsList.stream().map(CartItems::getBook).collect(Collectors.toList());
         String customerAddress = customerDetails.customerAddress + " " + customerDetails.customerLandmark + " " + customerDetails.customerTown + ", " + customerDetails.customerPinCode;
         String message = orderEmailTemplate.getHeader(user.getFullName())
-                + orderEmailTemplate.getOrderPlacedTemplate(cartItemsList, totalPrice, getFormattedDate(new Timestamp(System.currentTimeMillis()).toString()), customerAddress, savedOrder.getOrderId())
+                + orderEmailTemplate.getOrderPlacedTemplate(cartItemsList, orderDTO.totalPrice, getFormattedDate(new Timestamp(System.currentTimeMillis()).toString()), customerAddress, savedOrder.getOrderId())
                 + orderEmailTemplate.getFooter();
         cartItemsRepository.deleteCartItems(cart.getCardId());
         mailService.sendEmail(user.getEmail(), "Your Order Placed Successfully", message, bookList);
@@ -102,13 +106,13 @@ public class OrderService implements IOrderService {
     private String generateOrderId() {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("order_id").descending());
         Page<Orders> orders = orderRepository.fetchOrders(pageRequest);
-        if (!orders.hasContent())
+        if (!orders.hasContent()) {
             return String.format("%08d", 1);
+        }
         String previousOrderId = orders.getContent()
                 .get(0)
                 .getOrderId()
-                .substring(4)
-                .replaceFirst("^0+(?!$)", "");
+                .replace("^0+(?!$)", "");
         return String.format("%08d", Integer.parseInt(previousOrderId) + 1);
     }
 }

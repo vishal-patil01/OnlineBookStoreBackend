@@ -18,7 +18,6 @@ import com.enigma.bookstore.repository.ICartRepository;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.CartService;
 import com.enigma.bookstore.util.ITokenGenerator;
-import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,7 @@ public class CartServiceTest {
     BookDTO bookDTO;
     Cart cart;
     CartItems cartItems;
-    List<CartItems> cartList;
+    List<CartItems> cartItemsList;
     Book book;
 
     public CartServiceTest() {
@@ -72,10 +71,10 @@ public class CartServiceTest {
         cartDTO = new CartDTO(1, 1);
         cart = new Cart();
         cartItems = new CartItems(cartDTO, book, cart);
-        cartList = new ArrayList<>();
-        cartList.add(cartItems);
+        cartItemsList = new ArrayList<>();
+        cartItemsList.add(cartItems);
         cart.setCardId(1);
-        cart.setCartItems(cartList);
+        cart.setCartItems(cartItemsList);
     }
 
     @Test
@@ -143,18 +142,18 @@ public class CartServiceTest {
     @Test
     void givenRequest_WhenGetResponse_ShouldReturnCartData() {
         when(jwtToken.verifyToken(any())).thenReturn(1);
-        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
         when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
-        when(cartItemsRepository.findAllByCart_CardId(1)).thenReturn(cartList);
+        when(cartItemsRepository.findAllByCart_CardId(1)).thenReturn(cartItemsList);
         List<CartItems> itemsList = cartService.fetchCart("token");
-        Assert.assertEquals(cartList, itemsList);
+        Assert.assertEquals(cartItemsList, itemsList);
     }
 
     @Test
     void givenRequestToFetchCartList_WhenCartIsEmpty_ShouldThrowCartItemException() {
         try {
             when(jwtToken.verifyToken(any())).thenReturn(1);
-            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+            when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
             when(cartItemsRepository.findAllByCart_CardId(1)).thenThrow(new CartItemsException("There Are In Items In A Cart"));
             cartService.fetchCart("token");
@@ -189,18 +188,18 @@ public class CartServiceTest {
     @Test
     void givenCartId_WhenGetResponse_ShouldReturnCartDeletedSuccessfullyMessage() {
         when(jwtToken.verifyToken(any())).thenReturn(1);
-        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
         when(cartItemsRepository.findById(1)).thenReturn(Optional.ofNullable(cartItems));
         when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
         String existingBook = cartService.deleteBookFromCart(1, "token");
-        Assert.assertEquals("Cart Deleted Successfully", existingBook);
+        Assert.assertEquals("Book Removed From Cart", existingBook);
     }
 
     @Test
     void givenCartId_WhenItemWithCartItemIdNotExist_ShouldThrowCartItemsException() {
         try {
             when(jwtToken.verifyToken(any())).thenReturn(1);
-            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+            when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(cartItemsRepository.findById(1)).thenThrow(new CartItemsException("There Is No Such Item In Cart"));
             when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
             cartService.deleteBookFromCart(1, "token");
@@ -212,7 +211,7 @@ public class CartServiceTest {
     @Test
     void givenCartIdAndQuantity_WhenGetResponse_ShouldReturnCartUpdatedSuccessfullyMessage() {
         when(jwtToken.verifyToken(any())).thenReturn(1);
-        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
         when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
         when(cartItemsRepository.findById(1)).thenReturn(Optional.ofNullable(cartItems));
         when(cartRepository.save(any())).thenReturn(new CartItems());
@@ -224,7 +223,7 @@ public class CartServiceTest {
     void givenCartIdAndQuantity_WhenQuantityIsInvalid_ShouldReturnThrowBookException() {
         try {
             when(jwtToken.verifyToken(any())).thenReturn(1);
-            when(userRepository.findById(any())).thenReturn(java.util.Optional.of(new User()));
+            when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
             when(cartItemsRepository.findById(1)).thenReturn(Optional.ofNullable(cartItems));
             cartService.updateCartItemQuantity(1, -2, "token");

@@ -1,12 +1,8 @@
 package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.configuration.ConfigureRabbitMq;
-import com.enigma.bookstore.dto.BookDTO;
-import com.enigma.bookstore.dto.CartDTO;
-import com.enigma.bookstore.dto.CustomerDTO;
-import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.dto.*;
 import com.enigma.bookstore.enums.AddressType;
-import com.enigma.bookstore.enums.FilterAttributes;
 import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.model.*;
@@ -15,7 +11,6 @@ import com.enigma.bookstore.repository.*;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
 import com.enigma.bookstore.util.ITokenGenerator;
-import com.enigma.bookstore.util.implementation.JWTToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,13 +60,13 @@ public class OrderServiceTest {
     IOrderRepository orderRepository;
 
     @MockBean
-    ICartItemsRepository bookCartRepository;
-
-    @MockBean
     ICartRepository cartRepository;
 
     @MockBean
     ITokenGenerator tokenGenerator;
+
+    @MockBean
+    ICartItemsRepository cartItemsRepository;
 
     BookDTO bookDTO;
     Book bookDetails;
@@ -84,9 +79,12 @@ public class OrderServiceTest {
     List<Customer> customerDetailsList;
     CartItems bookCart;
     List<CartItems> bookCartList;
-    List<Orders> ordersList=new ArrayList<>();
+    List<Orders> ordersList = new ArrayList<>();
     Orders orders;
     Page<Orders> page;
+    CartItems cartItems;
+    List<CartItems> cartItemsList;
+    Book book;
 
     public OrderServiceTest() {
         bookDTO = new BookDTO("1234567890", "YOU WERE MY CRUSH: Till You Said You Love Me!", "Durjoy Datta", 400.0, 10, "Devotional", "book image", 2002);
@@ -109,10 +107,18 @@ public class OrderServiceTest {
         customerDetails = new Customer(customerDTO, userDetails);
         customerDetailsList = new ArrayList<>();
         customerDetailsList.add(customerDetails);
-        orders = new Orders(userDetails, 1400.0, customerDetails, "ORD-0000000000001");
+        orders = new Orders(userDetails, 1400.0, customerDetails, "00000001");
         ordersList.add(orders);
         Pageable pageRequest = PageRequest.of(0, 1, Sort.by("order_id"));
         page = new PageImpl<>(ordersList, pageRequest, 1);
+        cartDTO = new CartDTO(1, 1);
+        cart = new Cart();
+        book = new Book(bookDTO);
+        cartItems = new CartItems(cartDTO, book, cart);
+        cartItemsList = new ArrayList<>();
+        cartItemsList.add(cartItems);
+        cart.setCardId(1);
+        cart.setCartItems(cartItemsList);
     }
 
     @Test
@@ -121,22 +127,23 @@ public class OrderServiceTest {
         when(userRepository.findById(any())).thenReturn(java.util.Optional.of(userDetails));
         when(cartRepository.findByUserId(any())).thenReturn(java.util.Optional.of(new Cart()));
         when(customerDetailsRepository.findByUserIdAndAndCustomerAddressType(anyInt(), any())).thenReturn(customerDetailsList);
-        when(customerDetailsRepository.findByUserOrderByCustomerIdDesc(any())).thenReturn(customerDetailsList);
-        when(bookCartRepository.findByBookIdAndCart_CardId(anyInt(), anyInt())).thenReturn(bookCartList);
+        when(customerDetailsRepository.findByUserIdAndAndCustomerAddressType(any(), any())).thenReturn(customerDetailsList);
+        when(cartItemsRepository.findByBookIdAndCart_CardId(anyInt(), anyInt())).thenReturn(bookCartList);
         when(orderProductRepository.save(any())).thenReturn(new OrderProducts());
         when(orderRepository.fetchOrders(any())).thenReturn(page);
         when(orderRepository.save(any())).thenReturn(orders);
-        when(bookCartRepository.deleteCartItems(anyInt())).thenReturn(1);
+        when(cartItemsRepository.deleteCartItems(anyInt())).thenReturn(1);
         when(emailTemplateGenerator.getHeader(any())).thenReturn("Header");
         when(emailTemplateGenerator.getOrderPlacedTemplate(any(), any(), any(), any(), any())).thenReturn("Header");
         when(emailTemplateGenerator.getFooter()).thenReturn("Footer");
-        String message = orderBookService.placeOrder(1420.0, "authorization");
-        Assert.assertEquals("ORD-0000000000001", message);
+        when(cartItemsRepository.findAllByCart_CardId(any())).thenReturn(cartItemsList);
+        String message = orderBookService.placeOrder(new OrderDTO(AddressType.HOME, 124.0), "authorization");
+        Assert.assertEquals("00000001", message);
     }
 
     @Test
     void givenCustomerOrderDetailsToAddInDatabase_WhenAdded_ShouldReturnCorrectDetails1() {
-        Orders orderBookDetails = new Orders(userDetails, 1000.0, customerDetails, "ORD-0000000000001");
+        Orders orderBookDetails = new Orders(userDetails, 1000.0, customerDetails, "00000001");
         List<Orders> orderBookDetailsList = new ArrayList<>();
         orderBookDetailsList.add(orderBookDetails);
         when(tokenGenerator.verifyToken(any())).thenReturn(1);

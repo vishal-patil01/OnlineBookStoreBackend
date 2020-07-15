@@ -10,9 +10,6 @@ import lombok.Setter;
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 public class EmailTemplateDTO {
     public String email;
     public String subject;

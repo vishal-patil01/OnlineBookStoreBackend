@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin(origins = "*", exposedHeaders = "*,")
+@CrossOrigin(origins = "*", exposedHeaders = "authorization")
 @RequestMapping("bookstore/admin")
 public class AdminController {
 

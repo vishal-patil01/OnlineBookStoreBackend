@@ -70,7 +70,7 @@ public class BookControllerTest {
     @Test
     void givenFileName_WhenFound_ShouldReturnFile() throws Exception {
         String fileName="AnneFrank.jpg";
-        String imagePath="\\src\\main\\resources\\Images\\";
+        String imagePath="/src/main/resources/Images/";
         String fileBasePath = System.getProperty("user.dir")+imagePath;
         Path path = Paths.get(fileBasePath + fileName);
         Resource resource = new UrlResource(path.toUri());
