@@ -16,8 +16,6 @@ import java.util.Optional;
 public interface IOrderRepository extends JpaRepository<Orders, Integer> {
     List<Orders> findOrdersByUser_IdOrderByOrderPlacedDateDesc(Integer userId);
 
-    Optional<Orders> findByOrderId(Integer orderId);
-
     @Query(value = "select * from orders", nativeQuery = true)
     Page<Orders> fetchOrders(Pageable pageable);
 }

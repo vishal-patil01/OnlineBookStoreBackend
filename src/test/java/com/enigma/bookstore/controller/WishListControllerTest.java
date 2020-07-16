@@ -2,6 +2,7 @@ package com.enigma.bookstore.controller;
 
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.Response;
+import com.enigma.bookstore.exception.WishListItemsException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.WishList;
 import com.enigma.bookstore.model.WishListItems;
@@ -40,7 +41,7 @@ public class WishListControllerTest {
 
 
     @Test
-    void givenCartData_WhenAllValidationAreTrue_ShouldReturnBookAddedToWishListMessage() throws Exception {
+    void givenWishListData_WhenAllValidationAreTrue_ShouldReturnBookAddedToWishListMessage() throws Exception {
         WishListItems wishListItems = new WishListItems(book, new WishList());
         String jsonData = gson.toJson(wishListItems);
         String message = "Book Added To Wish List successful";
@@ -64,6 +65,19 @@ public class WishListControllerTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/wishlist")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Assert.assertTrue(response.contains(message));
+    }
+
+    @Test
+    void givenRequest_WhenWishListIsEmpty_ShouldReturnWishListRecords() throws Exception {
+        bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        WishListItems wishListItems = new WishListItems(book, new WishList());
+        wishList.add(wishListItems);
+        when(wishListService.fetchWishList(any())).thenThrow(new WishListItemsException("No Such Book In Wish List"));
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/wishlist")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        Assert.assertEquals("No Such Book In Wish List", responseDto.message);
     }
 
     @Test

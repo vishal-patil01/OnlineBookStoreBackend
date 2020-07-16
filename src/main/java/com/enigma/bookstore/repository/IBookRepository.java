@@ -23,7 +23,7 @@ public interface IBookRepository extends JpaRepository<Book, Integer> {
 
     @Transactional
     @Modifying
-    @Query(value = "update book set no_of_copies = no_of_copies - :quantity where id = :bid ", nativeQuery = true)
-    int updateBookQuantity(@Param("bid") Integer cid,@Param("quantity") Integer quantity);
+    @Query(value =   "update book set no_of_copies = no_of_copies - :quantity where id = :bid ", nativeQuery = true)
+    int updateBookQuantity(@Param("bid") Integer bid, @Param("quantity") Integer quantity);
 
 }

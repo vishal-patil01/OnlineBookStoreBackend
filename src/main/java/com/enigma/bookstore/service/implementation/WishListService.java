@@ -2,7 +2,6 @@ package com.enigma.bookstore.service.implementation;
 
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.exception.UserException;
-import com.enigma.bookstore.exception.WishListException;
 import com.enigma.bookstore.exception.WishListItemsException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.User;
@@ -15,6 +14,10 @@ import com.enigma.bookstore.repository.IWishListRepository;
 import com.enigma.bookstore.service.IWishListService;
 import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,10 +37,11 @@ public class WishListService implements IWishListService {
     private ITokenGenerator jwtToken;
 
     @Override
-    public void createWishList(User user) {
+    public String createWishList(User user) {
         WishList wishList = new WishList();
         wishList.setUser(user);
         wishListRepository.save(wishList);
+        return "Wish List Created Successfully";
     }
 
     @Override
@@ -78,6 +82,6 @@ public class WishListService implements IWishListService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserException("User Not Exist"));
         return wishListRepository.findByUserId(userId)
-                .orElseThrow(() -> new WishListException("WishList Id Not Found"));
+                .orElseThrow(() -> new WishListItemsException("WishList Id Not Found"));
     }
 }

@@ -11,13 +11,14 @@ import org.hibernate.validator.constraints.Range;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "book")
-public class Book {
+public class Book implements Serializable {
 
     @NotNull
     @Column(unique = true, nullable = false)

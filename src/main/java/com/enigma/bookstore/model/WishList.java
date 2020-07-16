@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -14,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name = "wishlist")
-public class WishList {
+public class WishList implements Serializable {
 
     @Id
     @GeneratedValue(

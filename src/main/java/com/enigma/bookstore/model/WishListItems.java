@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
@@ -15,7 +16,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Table(name = "wishlistitems")
-public class WishListItems {
+public class WishListItems implements Serializable {
 
     @Id
     @GeneratedValue(

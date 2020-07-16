@@ -48,9 +48,6 @@ public class OrderServiceTest {
     ICustomerRepository customerDetailsRepository;
 
     @MockBean
-    EmailTemplateGenerator emailTemplateGenerator;
-
-    @MockBean
     IMailService mailService;
 
     @MockBean
@@ -133,9 +130,6 @@ public class OrderServiceTest {
         when(orderRepository.fetchOrders(any())).thenReturn(page);
         when(orderRepository.save(any())).thenReturn(orders);
         when(cartItemsRepository.deleteCartItems(anyInt())).thenReturn(1);
-        when(emailTemplateGenerator.getHeader(any())).thenReturn("Header");
-        when(emailTemplateGenerator.getOrderPlacedTemplate(any(), any(), any(), any(), any())).thenReturn("Header");
-        when(emailTemplateGenerator.getFooter()).thenReturn("Footer");
         when(cartItemsRepository.findAllByCart_CardId(any())).thenReturn(cartItemsList);
         String message = orderBookService.placeOrder(new OrderDTO(AddressType.HOME, 124.0), "authorization");
         Assert.assertEquals("00000001", message);

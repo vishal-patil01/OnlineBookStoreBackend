@@ -16,6 +16,8 @@ import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.ICartService;
 import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,10 +37,11 @@ public class CartService implements ICartService {
     private ITokenGenerator jwtToken;
 
     @Override
-    public void createCart(User user) {
+    public String createCart(User user) {
         Cart cart = new Cart();
         cart.setUser(user);
         cartRepository.save(cart);
+        return "Cart Created Successfully";
     }
 
     @Override
@@ -46,7 +49,8 @@ public class CartService implements ICartService {
         Cart cart = checkUserAndCartIsExists(token);
         Book book = bookRepository.findById(cartDTO.id)
                 .orElseThrow(() -> new BookException("Book Not Found"));
-        List<CartItems> bookAlreadyExist = cartItemsRepository.findByBookIdAndCart_CardId(book.getId(), cart.getCardId());
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        Page<CartItems> bookAlreadyExist = cartItemsRepository.findCarts(pageRequest,book.getId(), cart.getCardId());
         if (bookAlreadyExist.isEmpty()) {
             CartItems cartBook = new CartItems(cartDTO, book, cart);
             cartItemsRepository.save(cartBook);
@@ -60,7 +64,7 @@ public class CartService implements ICartService {
         Cart cart = checkUserAndCartIsExists(token);
         List<CartItems> cartItemsList = cartItemsRepository.findAllByCart_CardId(cart.getCardId());
         if (cartItemsList.isEmpty())
-            throw new CartItemsException("There Are In Items In A Cart");
+            throw new CartItemsException("There Are No Items In A Cart");
         return cartItemsList;
     }
 

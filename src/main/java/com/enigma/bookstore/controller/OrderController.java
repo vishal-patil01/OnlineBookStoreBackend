@@ -7,6 +7,7 @@ import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Orders;
 import com.enigma.bookstore.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -23,9 +24,9 @@ public class OrderController {
     private IOrderService orderService;
 
     @PostMapping("/order")
-    public ResponseEntity<Response> placeOrder(@Valid @RequestBody OrderDTO orderDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
+    public ResponseEntity<Response> placeOrder(@RequestHeader(value = "token", required = false) String token,@Valid @RequestBody OrderDTO orderDTO,  BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            throw new UserException("Invalid Data !!! Please Enter Correct Data");
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
         String orderId = orderService.placeOrder(orderDTO, token);
         Response response = new Response("Order Placed Successfully", orderId, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);

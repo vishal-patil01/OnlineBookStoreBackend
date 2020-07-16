@@ -12,18 +12,19 @@ import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.service.implementation.UserService;
 import com.google.gson.Gson;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
@@ -33,8 +34,13 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
-
+    HttpHeaders httpHeaders = new HttpHeaders();
     Gson gson = new Gson();
+
+    @BeforeEach
+    void setUp() {
+        httpHeaders.set("token", "Qwebst43Y");
+    }
 
     @Test
     void givenUserRegistrationData_WhenAllValidationAreTrue_ShouldReturnRegistrationSuccessfulMessage() throws Exception {
@@ -49,6 +55,21 @@ public class UserControllerTest {
         Response responseDto = gson.fromJson(response, Response.class);
         String responseMessage = responseDto.message;
         Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenUserRegistrationData_WhenNotValid_ShouldReturnInvalidDataException() throws Exception {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam12345", "155885588", false, UserRole.USER);
+        User userDetails = new User(registrationDTO);
+        String stringConvertDTO = gson.toJson(userDetails);
+        String message = "REGISTRATION SUCCESSFUL";
+        when(userService.userRegistration(any(), any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/register").contentType(MediaType.APPLICATION_JSON)
+                .content(stringConvertDTO)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals("Invalid Data !!! Please Enter Correct Data", responseMessage);
     }
 
     @Test
@@ -122,6 +143,18 @@ public class UserControllerTest {
     }
 
     @Test
+    void givenUserLoginData_WhenNotValid_ShouldReturnInvalidEmailAddressMessage() throws Exception {
+        UserLoginDTO loginDTO = new UserLoginDTO("samgmail.com", "Asdfg@123");
+        String stringConvertDTO = gson.toJson(loginDTO);
+        String message = "Login Successful";
+        when(userService.userLogin(any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/login").contentType(MediaType.APPLICATION_JSON)
+                .content(stringConvertDTO)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Assert.assertEquals("Invalid Email Address", response);
+    }
+
+    @Test
     void givenLoginData_WhenEmailIdIsValidButPasswordIsInvalid_ShouldThrowUserExceptions() throws Exception {
         when(userService.verifyEmail(any())).thenThrow(new UserException("Enter Valid Password"));
         try {
@@ -155,7 +188,7 @@ public class UserControllerTest {
     void givenRestPasswordDTO_WhenTokenIsValid_ShouldReturnPasswordChangedSuccessfullyMessage() throws Exception {
         ResetPasswordDTO loginDTO = new ResetPasswordDTO("Asdfg@123");
         String stringConvertDTO = gson.toJson(loginDTO);
-        String message = "Password Changed Successfully ";
+        String message = "Password Changed Successfully";
         when(userService.resetPassword(any(), any())).thenReturn(message);
         MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/reset/password/").contentType(MediaType.APPLICATION_JSON)
                 .content(stringConvertDTO)).andReturn();
@@ -166,6 +199,19 @@ public class UserControllerTest {
     }
 
     @Test
+    void givenResetPasswordDTO_WhenNotValid_ShouldReturnPleaseEnterValidPasswordException() throws Exception {
+        ResetPasswordDTO loginDTO = new ResetPasswordDTO("fgoo");
+        String stringConvertDTO = gson.toJson(loginDTO);
+        String message = "Password Changed Successfully ";
+        when(userService.resetPassword(any(), any())).thenReturn(message);
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/user/reset/password").contentType(MediaType.APPLICATION_JSON)
+                .content(stringConvertDTO)
+                .headers(httpHeaders)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Assert.assertEquals("Password Must have At least *characters And Contains 1 Uppercase 1 Lowercase 1 Special Character 1 Digit", response);
+    }
+
+    @Test
     void givenRestPasswordDTO_WhenTokenIsNotValid_ShouldThrowJwtTokenException() throws Exception {
         try {
             when(userService.resetPassword(any(), any())).thenThrow(new JWTException("Token Expired"));
@@ -173,5 +219,19 @@ public class UserControllerTest {
         } catch (JWTException e) {
             Assert.assertEquals("Token Expired", e.getMessage());
         }
+    }
+
+    @Test
+    void givenUserToken_WhenVerified_ShouldReturnUserDetails() throws Exception {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam12345", "155885588", false, UserRole.USER);
+        User userDetails = new User(registrationDTO);
+        when(userService.fetchUserDetails(any())).thenReturn(userDetails);
+        MvcResult mvcResult = mockMvc.perform(get("/bookstore/user/details").contentType(MediaType.APPLICATION_JSON)
+                .content("token"))
+                .andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals("User Data Fetched Successfully", responseMessage);
     }
 }

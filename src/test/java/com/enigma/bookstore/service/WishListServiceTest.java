@@ -3,6 +3,8 @@ package com.enigma.bookstore.service;
 
 import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
+import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.WishListItemsException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.User;
@@ -68,6 +70,15 @@ public class WishListServiceTest {
         wishListItemsList.add(wishListItems);
         wishList.setWishId(1);
         wishList.setWishListItems(wishListItemsList);
+    }
+
+    @Test
+    void givenRequestForNewWishList_WhenProper_ShouldReturn_WishListCreatedSuccessfullyMessage() {
+        when(wishListRepository.save(any())).thenReturn(wishList);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "dhanashree.bhide3@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user=new User(registrationDTO);
+        String message = wishListService.createWishList(user);
+        Assert.assertEquals("Wish List Created Successfully", message);
     }
 
     @Test

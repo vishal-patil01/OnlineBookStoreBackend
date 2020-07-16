@@ -3,6 +3,8 @@ package com.enigma.bookstore.service;
 import com.enigma.bookstore.configuration.ConfigureRabbitMq;
 import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CartDTO;
+import com.enigma.bookstore.dto.UserRegistrationDTO;
+import com.enigma.bookstore.enums.UserRole;
 import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.exception.CartException;
 import com.enigma.bookstore.exception.CartItemsException;
@@ -78,6 +80,15 @@ public class CartServiceTest {
     }
 
     @Test
+    void givenRequestForNewCart_WhenProper_ShouldReturn_CartCreatedSuccessfullyMessage() {
+        when(cartRepository.save(any())).thenReturn(cart);
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "dhanashree.bhide3@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user=new User(registrationDTO);
+        String message = cartService.createCart(user);
+        Assert.assertEquals("Cart Created Successfully", message);
+    }
+
+    @Test
     void givenCart_WhenGetResponse_ShouldReturnBookAddedToCartSuccessfullyMessage() {
         when(jwtToken.verifyToken(any())).thenReturn(1);
         when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
@@ -96,10 +107,10 @@ public class CartServiceTest {
             when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(bookStoreRepository.findById(any())).thenReturn(Optional.of(new Book()));
             when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
-            when(cartItemsRepository.findByBookIdAndCart_CardId(any(), any())).thenThrow(new CartItemsException("Book Already Added To Cart"));
+            when(cartItemsRepository.findByBookIdAndCart_CardId(any(), any())).thenReturn(cartItemsList);
             cartService.addToCart(cartDTO, "authorization");
         } catch (CartItemsException e) {
-            Assert.assertEquals("Book Already Added To Cart", e.getMessage());
+            Assert.assertEquals("Book Already Exists In Cart", e.getMessage());
         }
     }
 
@@ -152,13 +163,14 @@ public class CartServiceTest {
     @Test
     void givenRequestToFetchCartList_WhenCartIsEmpty_ShouldThrowCartItemException() {
         try {
+            List<CartItems> cartItems = new ArrayList<>();
             when(jwtToken.verifyToken(any())).thenReturn(1);
             when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
             when(cartRepository.findByUserId(any())).thenReturn(Optional.of(cart));
-            when(cartItemsRepository.findAllByCart_CardId(1)).thenThrow(new CartItemsException("There Are In Items In A Cart"));
+            when(cartItemsRepository.findAllByCart_CardId(1)).thenReturn(cartItems);
             cartService.fetchCart("token");
         } catch (CartItemsException e) {
-            Assert.assertEquals("There Are In Items In A Cart", e.getMessage());
+            Assert.assertEquals("There Are No Items In A Cart", e.getMessage());
         }
     }
 

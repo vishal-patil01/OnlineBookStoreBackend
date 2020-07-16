@@ -23,10 +23,11 @@ public class CartController {
     ICartService bookCartService;
 
     @PostMapping("/cart")
-    public ResponseEntity<Response> addToCart(@Valid @RequestBody CartDTO bookCartDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            throw new CartException("Invalid Data !!! Please Enter Valid Data");
-        String message = bookCartService.addToCart(bookCartDTO, token);
+    public ResponseEntity<Response> addToCart(@RequestHeader(value = "token", required = false) String token,@Valid @RequestBody CartDTO cartDTO,  BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        }
+        String message = bookCartService.addToCart(cartDTO, token);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -51,5 +52,4 @@ public class CartController {
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }

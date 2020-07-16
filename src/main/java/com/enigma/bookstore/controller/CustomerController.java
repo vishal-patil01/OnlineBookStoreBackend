@@ -25,7 +25,7 @@ public class CustomerController {
     private ICustomerService customerService;
 
     @PostMapping("/customer")
-    public ResponseEntity<Response> addCustomerDetails(@Valid @RequestBody CustomerDTO customerDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
+    public ResponseEntity<Response> addCustomerDetails( @RequestHeader(value = "token", required = false) String token,@Valid @RequestBody CustomerDTO customerDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
         String message = customerService.addCustomerDetails(customerDTO, token);
