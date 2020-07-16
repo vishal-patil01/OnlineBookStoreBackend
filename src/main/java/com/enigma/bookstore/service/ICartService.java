@@ -7,7 +7,7 @@ import com.enigma.bookstore.model.User;
 import java.util.List;
 
 public interface ICartService {
-    void createCart(User user);
+    String createCart(User user);
 
     String addToCart(CartDTO bookCartDTO, String token);
 

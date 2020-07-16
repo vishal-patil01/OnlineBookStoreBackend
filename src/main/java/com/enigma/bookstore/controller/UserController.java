@@ -4,7 +4,6 @@ import com.enigma.bookstore.dto.ResetPasswordDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.dto.UserLoginDTO;
 import com.enigma.bookstore.dto.UserRegistrationDTO;
-import com.enigma.bookstore.exception.BookException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.service.IUserService;
@@ -53,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> login(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletResponse httpServletResponse, BindingResult bindingResult) {
+    public ResponseEntity<Response> login( HttpServletResponse httpServletResponse,@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
         String token = userService.userLogin(userLoginDTO);
@@ -62,10 +61,10 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/reset/password/")
-    public ResponseEntity<Response> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO, @RequestParam(value = "token", defaultValue = "") String token, BindingResult bindingResult) {
+    @PostMapping("/reset/password")
+    public ResponseEntity resetPassword( @RequestHeader(value = "token", required = false) String token,@Valid @RequestBody ResetPasswordDTO resetPasswordDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            throw new BookException("Invalid Data !!! Please Enter Valid Password");
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.ALREADY_REPORTED);
         String message = userService.resetPassword(resetPasswordDTO, token);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -74,7 +73,7 @@ public class UserController {
     @GetMapping("/details")
     public ResponseEntity<Response> fetchUserDetails(@RequestHeader(value = "token", required = false) String token) {
         User user = userService.fetchUserDetails(token);
-        Response response = new Response("Cart Data Fetched Successfully", user, 200);
+        Response response = new Response("User Data Fetched Successfully", user, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

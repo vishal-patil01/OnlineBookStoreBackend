@@ -23,12 +23,17 @@ public class AdminController {
     IAdminService adminService;
 
     @PostMapping("/book")
-    public ResponseEntity<Response> addBook(@Valid @RequestBody BookDTO bookDTO, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
-        return getResponseResponseEntity(bindingResult, adminService.addBook(bookDTO, token));
+    public ResponseEntity<Response> addBook(@RequestHeader(value = "token", required = false) String token,@Valid @RequestBody BookDTO bookDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        }
+        String message = adminService.addBook(bookDTO, token);
+        Response response = new Response(message, null, 200);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> adminLogin(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletResponse httpServletResponse, BindingResult bindingResult) {
+    public ResponseEntity<Response> adminLogin( HttpServletResponse httpServletResponse,@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -46,15 +51,11 @@ public class AdminController {
     }
 
     @PostMapping("/book/{bookid}")
-    public ResponseEntity<Response> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable(name = "bookid") Integer bookId, @RequestHeader(value = "token", required = false) String token, BindingResult bindingResult) {
-        return getResponseResponseEntity(bindingResult, adminService.updateBook(bookDTO, bookId, token));
-    }
-
-    private ResponseEntity<Response> getResponseResponseEntity(BindingResult bindingResult, String serviceResponse) {
+    public ResponseEntity<Response> updateBook( @RequestHeader(value = "token", required = false) String token,@Valid @RequestBody BookDTO bookDTO, @PathVariable(name = "bookid") Integer bookId, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity(bindingResult.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
-        String message = serviceResponse;
+        String message = adminService.updateBook(bookDTO, bookId, token);
         Response response = new Response(message, null, 200);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

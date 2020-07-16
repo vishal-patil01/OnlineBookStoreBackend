@@ -7,13 +7,14 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "orderProducts")
-public class OrderProducts {
+public class OrderProducts implements Serializable {
 
     @Id
     @GeneratedValue(

@@ -48,8 +48,8 @@ public class UserService implements IUserService {
     @Override
     public String userRegistration(UserRegistrationDTO userRegistrationDTO, HttpServletRequest httpServletRequest) {
         boolean isUserPresent = userRepository.findByEmail(userRegistrationDTO.email).isPresent();
-        if (isUserPresent)
-            throw new UserException("User With This Email Address Already Exists");
+//        if (isUserPresent)
+//            throw new UserException("User With This Email Address Already Exists");
         String password = bCryptPasswordEncoder.encode(userRegistrationDTO.password);
         User user = new User(userRegistrationDTO);
         user.setPassword(password);

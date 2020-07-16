@@ -116,12 +116,11 @@ public class CustomerControllerTest {
 
     @Test
     void givenRequestForFetchCustomerDetails_WhenCustomerDetailsNotFound_ShouldThrowException() throws Exception {
-        try {
-            when(customerService.fetchCustomerDetails(any(), any())).thenThrow(new CustomerException("There is No CustomerData Available"));
-            this.mockMvc.perform(post("/bookstore/customer")).andReturn();
-        } catch (CustomerException e) {
-            Assert.assertSame("There is No CustomerData Available", e.getMessage());
-        }
+        when(customerService.fetchCustomerDetails(any(), any())).thenThrow(new CustomerException("There is No CustomerData Available"));
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/customer/" + AddressType.HOME)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        Assert.assertEquals("There is No CustomerData Available", responseDto.message);
     }
 
     @Test

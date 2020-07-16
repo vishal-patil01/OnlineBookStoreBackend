@@ -12,13 +12,14 @@ import org.hibernate.validator.constraints.Range;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "customer")
-public class Customer {
+public class Customer implements Serializable {
 
     @Id
     @GeneratedValue(
@@ -55,7 +56,7 @@ public class Customer {
     public AddressType customerAddressType;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "userId")
     private User user;
 

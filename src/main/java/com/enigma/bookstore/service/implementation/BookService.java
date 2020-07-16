@@ -8,6 +8,7 @@ import com.enigma.bookstore.repository.IBookRepository;
 import com.enigma.bookstore.service.IBookService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -26,10 +27,13 @@ public class BookService implements IBookService {
     @Autowired
     private ApplicationProperties applicationProperties;
 
+
     @Override
+    @Cacheable(cacheNames = "books")
     public Page<Book> fetchBooks(String searchText, int pageNo, FilterAttributes filterAttributes) {
         if (pageNo <= 0)
             throw new BookException("Invalid Page Number");
+        System.out.println("fetched from db");
         PageRequest pageRequest = PageRequest.of(pageNo - 1, 12, filterAttributes.sort);
         Page<Book> books = bookRepository.fetchBooks(pageRequest, searchText);
         if (books.hasContent())

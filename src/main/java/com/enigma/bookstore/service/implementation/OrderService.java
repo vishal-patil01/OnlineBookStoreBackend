@@ -12,6 +12,9 @@ import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
 import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -74,8 +77,10 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    @Cacheable(cacheNames = "MyOrdersDetails")
     public List<Orders> fetchOrders(String token) {
         User user = userRepository.findById(jwtToken.verifyToken(token)).orElseThrow(() -> new UserException("User Not Found"));
+        System.out.println("orders from db");
         List<Orders> ordersPlacedByUser = orderRepository.findOrdersByUser_IdOrderByOrderPlacedDateDesc(user.getId());
         if (ordersPlacedByUser.isEmpty())
             throw new OrderException("There Is No Order Placed Yet");

@@ -9,18 +9,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "user")
-public class User {
+@Table(uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(

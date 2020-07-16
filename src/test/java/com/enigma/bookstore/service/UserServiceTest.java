@@ -11,6 +11,7 @@ import com.enigma.bookstore.model.User;
 import com.enigma.bookstore.properties.ApplicationProperties;
 import com.enigma.bookstore.repository.IUserRepository;
 import com.enigma.bookstore.service.implementation.UserService;
+import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
 import com.enigma.bookstore.util.ITokenGenerator;
 import com.enigma.bookstore.util.implementation.JWTToken;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -53,20 +55,30 @@ public class UserServiceTest {
     IUserRepository iUserRepository;
 
     @MockBean
+    ICartService cartService;
+
+    @MockBean
+    IWishListService wishListService;
+
+    @MockBean
     BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Mock
     HttpServletRequest httpServletRequest;
 
     @Test
     void givenUserRegistrationData_WhenEmailIdAllReadyExist_ShouldReturnEmailIdAlreadyPresentMessage() {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
-        when(iUserRepository.findByEmail(any())).thenThrow(new UserException("User With This Email Address Already Exists"));
         try {
-            userService.userRegistration(registrationDTO, any());
+            UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+            User user=new User(registrationDTO);
+            when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+            when(httpServletRequest.getHeader(any())).thenReturn("verify");
+            userService.userRegistration(registrationDTO, httpServletRequest);
         } catch (UserException e) {
             Assert.assertEquals("User With This Email Address Already Exists", e.getMessage());
         }
     }
+
 
     @Test
     void givenUserRegistrationData_WhenAllValidationAreTrue_ShouldReturnRegistrationSuccessfulMessage() {
@@ -172,6 +184,60 @@ public class UserServiceTest {
         } catch (JWTException e) {
             Assert.assertEquals("Token Expired", e.getMessage());
         }
+    }
+
+    @Test
+    void givenEmailRequest_WhenProper_ShouldReturnVerificationEmailHasBeenSentMessage() {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "dhanashree.bhide3@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user=new User(registrationDTO);
+        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(jwtToken.generateToken(any(),any())).thenReturn("token");
+        when(httpServletRequest.getHeader(any())).thenReturn("URL");
+        String emailMessage = userService.sendEmailWithTokenLink("dhanashree.bhide3@gmail.com", httpServletRequest);
+        Assert.assertEquals("Verification Email Has Been Sent", emailMessage);
+    }
+
+    @Test
+    void givenToken_WhenValid_ShouldReturnUser() {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user = new User(registrationDTO);
+        when(jwtToken.verifyToken(any())).thenReturn(1);
+        when(iUserRepository.findById(any())).thenReturn(Optional.of(user));
+        User userDetails = userService.fetchUserDetails("token");
+        Assert.assertEquals(user.getFullName(), userDetails.getFullName());
+    }
+
+    @Test
+    void givenEmailId_WhenFound_ShouldReturnFullName() {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "sam@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user = new User(registrationDTO);
+        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        String userFullName = userService.getUserFullName("sam@gmail.com");
+        Assert.assertEquals(user.getFullName(), userFullName);
+    }
+
+    @Test
+    void givenResetRequest_WhenProper_ShouldReturnResetPasswordLinkHasBeenSentMessage() {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "dhanashree.bhide3@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user=new User(registrationDTO);
+        when(iUserRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(jwtToken.generateToken(any(),any())).thenReturn("token");
+        when(httpServletRequest.getHeader(any())).thenReturn("forget");
+        String emailMessage = userService.sendEmailWithTokenLink("dhanashree.bhide3@gmail.com", httpServletRequest);
+        Assert.assertEquals("Reset Password Link Has Been Sent", emailMessage);
+    }
+
+    @Test
+    void givenToken_WhenProper_ShouldReturnVerificationEmailHasBeenSuccessfulMessage() {
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO("Sam", "dhanashree.bhide3@gmail.com", "Sam@12345", "8855885588", false, UserRole.USER);
+        User user=new User(registrationDTO);
+        when(iUserRepository.findById(any())).thenReturn(Optional.of(user));
+        when(jwtToken.generateToken(any(),any())).thenReturn("token");
+        when(iUserRepository.save(any())).thenReturn(new User());
+        when(cartService.createCart(any())).thenReturn("Cart Created Successfully");
+        when(wishListService.createWishList(any())).thenReturn("Wish List Created Successfully");
+        String emailMessage = userService.verifyEmail("token");
+        Assert.assertEquals("Email Address Verified", emailMessage);
     }
 }
 

@@ -3,6 +3,7 @@ package com.enigma.bookstore.controller;
 import com.enigma.bookstore.dto.OrderDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.enums.AddressType;
+import com.enigma.bookstore.exception.OrderException;
 import com.enigma.bookstore.exception.UserException;
 import com.enigma.bookstore.model.Customer;
 import com.enigma.bookstore.model.Orders;
@@ -64,7 +65,7 @@ public class OrdersControllerTest {
     }
 
     @Test
-    void givenRequest_WhenCartIsNotEmpty_ShouldReturnCartRecords() throws Exception {
+    void givenRequest_WhenOrdersIsNotEmpty_ShouldReturnOrdersRecords() throws Exception {
         List<Orders> ordersList = new ArrayList<>();
         Orders orders = new Orders();
         orders.setOrderId("00000001");
@@ -74,5 +75,14 @@ public class OrdersControllerTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/order")).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Assert.assertTrue(response.contains("00000001"));
+    }
+
+    @Test
+    void givenRequest_WhenOrdersIsEmpty_ShouldThrowOrderException() throws Exception {
+        when(orderService.fetchOrders(any())).thenThrow(new OrderException("There Is No Order Placed yet"));
+        MvcResult mvcResult = this.mockMvc.perform(get("/bookstore/order")).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        Assert.assertEquals("There Is No Order Placed yet", responseDto.message);
     }
 }

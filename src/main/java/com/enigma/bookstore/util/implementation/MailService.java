@@ -33,7 +33,6 @@ public class MailService implements IMailService {
         javaMailSender.send(mimeMessage);
     }
 
-    @Async
     @Override
     public void sendEmail(String email, String subject, String message, List<Book> attachments) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();

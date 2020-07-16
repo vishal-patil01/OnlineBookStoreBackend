@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name = "orders")
-public class Orders {
+public class Orders implements Serializable {
 
     @Id
     @GeneratedValue(
@@ -40,7 +41,7 @@ public class Orders {
     private User user;
 
 
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(mappedBy = "orders",fetch = FetchType.EAGER)
     private List<OrderProducts> orderProducts;
 
     @ManyToOne()

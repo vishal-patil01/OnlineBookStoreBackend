@@ -4,7 +4,9 @@ import com.enigma.bookstore.dto.BookDTO;
 import com.enigma.bookstore.dto.CartDTO;
 import com.enigma.bookstore.dto.Response;
 import com.enigma.bookstore.exception.BookException;
+import com.enigma.bookstore.exception.CartException;
 import com.enigma.bookstore.exception.CartItemsException;
+import com.enigma.bookstore.exception.JWTException;
 import com.enigma.bookstore.model.Book;
 import com.enigma.bookstore.model.Cart;
 import com.enigma.bookstore.model.CartItems;
@@ -65,7 +67,24 @@ public class CartControllerTest {
         CartItems cartBook = new CartItems(cartDTO, book, cart);
         String jsonData = gson.toJson(cartBook);
         String message = "Book Already Added In Cart";
-        when(cartService.addToCart(any(), any())).thenThrow(new CartItemsException("Book Already Added In Cart"));
+        when(cartService.addToCart(any(), any())).thenThrow(new CartException("Book Already Added In Cart"));
+        MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/cart/").contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData)).andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Response responseDto = gson.fromJson(response, Response.class);
+        String responseMessage = responseDto.message;
+        Assert.assertEquals(message, responseMessage);
+    }
+
+    @Test
+    void givenCartData_WhenTokenIsNotValid_ShouldThrowJWTTokenException() throws Exception {
+        CartDTO cartDTO = new CartDTO(1, 2);
+        bookDTO = new BookDTO("3436456546654", "Wings Of Fire", "A. P. J. Abdul Kalam", 400.0, 2, "Story Of Abdul Kalam", "/temp/pic01", 2014);
+        Book book = new Book(bookDTO);
+        CartItems cartBook = new CartItems(cartDTO, book, cart);
+        String jsonData = gson.toJson(cartBook);
+        String message = "Token Is Not Valid";
+        when(cartService.addToCart(any(), any())).thenThrow(new JWTException("Token Is Not Valid"));
         MvcResult mvcResult = this.mockMvc.perform(post("/bookstore/cart/").contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData)).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
