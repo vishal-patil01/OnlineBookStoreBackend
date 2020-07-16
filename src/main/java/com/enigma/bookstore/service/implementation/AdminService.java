@@ -20,6 +20,7 @@ import com.enigma.bookstore.service.IAdminService;
 import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -105,6 +106,7 @@ public class AdminService implements IAdminService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "books", allEntries = true)
     public String updateBook(BookDTO bookDTO, Integer bookId, String token) {
         if (!checkIsAuthorizedUser(token))
             throw new UserException("User Dont Have Admin Privilege");

@@ -12,6 +12,8 @@ import com.enigma.bookstore.util.EmailTemplateGenerator;
 import com.enigma.bookstore.util.IMailService;
 import com.enigma.bookstore.util.ITokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -24,6 +26,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +53,11 @@ public class OrderService implements IOrderService {
     @Autowired
     IOrderProductsRepository orderProductsRepository;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @Override
+    @CacheEvict(cacheNames = "books", allEntries = true)
     public String placeOrder(OrderDTO orderDTO, String token) {
         Cart cart = checkUserAndCartIsExists(token);
         List<CartItems> cartItemsList = cartItemsRepository.findAllByCart_CardId(cart.getCardId());
@@ -73,6 +80,7 @@ public class OrderService implements IOrderService {
                 + orderEmailTemplate.getFooter();
         cartItemsRepository.deleteCartItems(cart.getCardId());
         mailService.sendEmail(user.getEmail(), "Your Order Placed Successfully", message, bookList);
+        cacheManager.getCacheNames().forEach(name -> Objects.requireNonNull(Objects.requireNonNull(cacheManager.getCache(name))).clear());
         return savedOrder.getOrderId();
     }
 
